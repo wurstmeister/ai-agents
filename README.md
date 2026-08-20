@@ -92,7 +92,9 @@ versions = {
 
 **Most agents** (codex, qwen-code, goose, aichat, aider-chat) use `fetchFromGitHub` from nixpkgs, so the version override automatically updates the source.
 
-**For opencode**: Uses the version from nixpkgs directly (source build with bun). The version follows whatever is in your nixpkgs input.
+**For opencode**: Uses custom binary fetch from GitHub releases for fast builds. To update:
+1. Update `versions.opencode` in `flake.nix`
+2. Update `hashes.opencode` in `flake.nix` with the new sha256 (use a fake hash like `sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=` and rebuild; Nix will print the actual hash)
 
 **For claude-code**: The version is pinned in `pkgs/claude-code/manifest.json`. To update it:
 1. Run `./pkgs/claude-code/update.sh` to fetch the latest manifest
@@ -120,7 +122,7 @@ inputs = {
 
 ## Notes
 
-- **opencode**: Uses nixpkgs directly (source build with bun, follows nixpkgs version)
+- **opencode**: Uses custom binary fetch from GitHub releases (fast builds, easy version overrides)
 - **claude-code**: Uses local package with manifest-based binary fetch (pinned in `pkgs/claude-code/manifest.json`)
 - **Other agents**: Use nixpkgs as base with version overrides for quick updates
 - **claude-code is unfree** - the flake is configured with `allowUnfreePredicate` to allow it
