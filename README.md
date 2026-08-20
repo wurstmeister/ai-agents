@@ -6,8 +6,8 @@ This is a Nix flake for popular AI coding agents with quick version overrides.
 
 ## Available Agents
 
-- **opencode** - The open source AI coding agent (custom binary fetch)
-- **claude-code** - Anthropic's official coding agent
+- **opencode** - The open source AI coding agent (from nixpkgs)
+- **claude-code** - Anthropic's official coding agent (local manifest-based fetch)
 - **codex** - OpenAI's coding agent
 - **qwen-code** - Qwen's coding agent
 - **goose** - Block's coding agent
@@ -92,7 +92,7 @@ versions = {
 
 **Most agents** (codex, qwen-code, goose, aichat, aider-chat) use `fetchFromGitHub` from nixpkgs, so the version override automatically updates the source.
 
-**For opencode**: The version is pinned in `pkgs/opencode/default.nix` and uses a binary fetch.
+**For opencode**: Uses the version from nixpkgs directly (source build with bun). The version follows whatever is in your nixpkgs input.
 
 **For claude-code**: The version is pinned in `pkgs/claude-code/manifest.json`. To update it:
 1. Run `./pkgs/claude-code/update.sh` to fetch the latest manifest
@@ -120,11 +120,10 @@ inputs = {
 
 ## Notes
 
-- **opencode**: Uses custom binary fetch from GitHub releases (pinned in `pkgs/opencode/default.nix`)
+- **opencode**: Uses nixpkgs directly (source build with bun, follows nixpkgs version)
 - **claude-code**: Uses local package with manifest-based binary fetch (pinned in `pkgs/claude-code/manifest.json`)
 - **Other agents**: Use nixpkgs as base with version overrides for quick updates
 - **claude-code is unfree** - the flake is configured with `allowUnfreePredicate` to allow it
-- The binary is wrapped with `NODE_OPTIONS="--max-old-space-size=8192"` to ensure it has enough memory
 - Supported systems: x86_64-linux, x86_64-darwin, aarch64-darwin, aarch64-linux
 
 ## First Build

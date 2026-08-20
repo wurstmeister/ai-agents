@@ -25,7 +25,6 @@
         # Override versions here for quick updates
         # Each agent uses nixpkgs as the base but pins a specific version
         versions = {
-          opencode = "1.18.18";
           claude-code = "2.1.235"; # from pkgs/claude-code/manifest.json
           codex = "0.147.0";
           qwen-code = "0.16.0";
@@ -51,15 +50,15 @@
             });
           });
 
-        # Special handling for opencode (uses binary releases)
-        opencode = pkgs.callPackage ./pkgs/opencode { };
-
         # Simple agents that use fetchFromGitHub
         codex = mkAgent "codex" versions.codex;
         qwen-code = mkAgent "qwen-code" versions.qwen-code;
         goose = mkAgent "goose" versions.goose;
         aichat = mkAgent "aichat" versions.aichat;
         aider-chat = mkAgent "aider-chat" versions.aider-chat;
+
+        # opencode from nixpkgs (source build, follows nixpkgs version)
+        opencode = pkgs.opencode;
 
         # claude-code uses a manifest, needs special handling
         # Use our local package that allows version overrides
