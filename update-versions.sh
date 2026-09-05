@@ -39,13 +39,14 @@ update_version() {
 }
 
 update_hash() {
-  local new_hash=$1
+  local platform=$1
+  local new_hash=$2
   if [[ "$DRY_RUN" == "true" ]]; then
-    echo "  [dry-run] Would update opencode hash to $new_hash"
+    echo "  [dry-run] Would update opencode $platform hash to $new_hash"
   else
-    sed -i.bak "s/opencode = \"sha256-[^\"]*\"/opencode = \"${new_hash}\"/" "$FLAKE_FILE"
+    sed -i.bak "s|^[[:space:]]*\"${platform}\" = \"sha256-[^\"]*\"|            \"${platform}\" = \"${new_hash}\"|" "$FLAKE_FILE"
     rm -f "${FLAKE_FILE}.bak"
-    echo "  Updated opencode hash to $new_hash"
+    echo "  Updated opencode $platform hash"
   fi
 }
 
@@ -72,17 +73,18 @@ if [[ "$CURRENT_OC" != "$LATEST_OC" ]]; then
   update_version "opencode" "$LATEST_OC"
   # Compute new hash
   if [[ "$DRY_RUN" == "false" ]]; then
-    ARCH=$(uname -m)
-    if [[ "$ARCH" == "arm64" ]] || [[ "$ARCH" == "aarch64" ]]; then
-      PLATFORM="darwin-arm64"
-    else
-      PLATFORM="darwin-x64"
-    fi
-    URL="https://github.com/anomalyco/opencode/releases/download/v${LATEST_OC}/opencode-${PLATFORM}.zip"
-    echo "  Fetching hash for $URL..."
-    RAW_HASH=$(nix-prefetch-url --unpack "$URL" 2>/dev/null)
-    SRI_HASH=$(nix hash to-sri --type sha256 "$RAW_HASH" 2>/dev/null)
-    update_hash "$SRI_HASH"
+    for PLATFORM in darwin-arm64 darwin-x64 linux-arm64 linux-x64; do
+      if [[ "$PLATFORM" == darwin-* ]]; then
+        ARCHIVE_EXTENSION="zip"
+      else
+        ARCHIVE_EXTENSION="tar.gz"
+      fi
+      URL="https://github.com/anomalyco/opencode/releases/download/v${LATEST_OC}/opencode-${PLATFORM}.${ARCHIVE_EXTENSION}"
+      echo "  Fetching hash for $URL..."
+      RAW_HASH=$(nix-prefetch-url "$URL" 2>/dev/null)
+      SRI_HASH=$(nix hash to-sri --type sha256 "$RAW_HASH" 2>/dev/null)
+      update_hash "$PLATFORM" "$SRI_HASH"
+    done
   fi
 else
   echo "opencode: up to date ($CURRENT_OC)"

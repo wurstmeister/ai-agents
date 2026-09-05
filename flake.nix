@@ -43,7 +43,12 @@
 
         # Hashes for binary fetch agents (opencode)
         hashes = {
-          opencode = "sha256-/nZPfzYMWEqD4Y3V8j+xprJyX17ohUsCUv5Vj3eY6UY=";
+          opencode = {
+            "darwin-arm64" = "sha256-/nZPfzYMWEqD4Y3V8j+xprJyX17ohUsCUv5Vj3eY6UY=";
+            "darwin-x64" = "sha256-tCL8EpNrbwmDZGCtjcc91c0IfoFlyattcrQNxQ1fEq8=";
+            "linux-arm64" = "sha256-4mUALMDsNYYQvP3VAKUVL/dMVKzGhkf+6Gg6C2UJmWo=";
+            "linux-x64" = "sha256-6oALf/ViJrcJUhJsn8HiUXykxLVoL9nT+eh0SWl6EZQ=";
+          };
         };
 
 # Build agents from nixpkgs with overridden versions
@@ -87,7 +92,15 @@
         # opencode uses binary fetch for fast builds and easy version overrides
         opencode = pkgs.callPackage ./pkgs/opencode {
           version = versions.opencode;
-          hash = hashes.opencode;
+          hash =
+            hashes.opencode.${
+              if pkgs.stdenv.hostPlatform.isDarwin then
+                if pkgs.stdenv.hostPlatform.isx86_64 then "darwin-x64" else "darwin-arm64"
+              else if pkgs.stdenv.hostPlatform.isx86_64 then
+                "linux-x64"
+              else
+                "linux-arm64"
+            };
         };
 
         # claude-code uses a manifest, needs special handling
