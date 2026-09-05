@@ -127,6 +127,18 @@
             ;
         };
 
+        checks = pkgs.lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
+          opencode-nixos = pkgs.testers.nixosTest {
+            name = "opencode-nixos";
+            nodes.machine = { ... }: {
+              environment.systemPackages = [ opencode ];
+            };
+            testScript = ''
+              machine.succeed("opencode --version")
+            '';
+          };
+        };
+
         apps = {
           default = {
             type = "app";

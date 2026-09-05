@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchurl,
+  autoPatchelfHook,
   makeWrapper,
   unzip,
   version ? "1.18.18",
@@ -37,7 +38,12 @@ stdenv.mkDerivation rec {
     inherit url hash;
   };
 
-  nativeBuildInputs = [ makeWrapper unzip ];
+  nativeBuildInputs = [
+    makeWrapper
+    unzip
+  ]
+  ++ lib.optionals stdenv.hostPlatform.isElf [ autoPatchelfHook ];
+  buildInputs = lib.optionals stdenv.hostPlatform.isElf [ stdenv.cc.cc.lib ];
 
   dontUnpack = true;
   dontConfigure = true;
