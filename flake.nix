@@ -45,8 +45,8 @@
         hashes = {
           opencode = {
             "darwin-arm64" = "sha256-/nZPfzYMWEqD4Y3V8j+xprJyX17ohUsCUv5Vj3eY6UY=";
-            "darwin-x64" = "sha256-tCL8EpNrbwmDZGCtjcc91c0IfoFlyattcrQNxQ1fEq8=";
-            "linux-arm64" = "sha256-4mUALMDsNYYQvP3VAKUVL/dMVKzGhkf+6Gg6C2UJmWo=";
+            "darwin-x64" = "sha256-mFiFPnus270iwtcMN34AncSzVN0E9ViHBUEeevuJ/S0=";
+            "linux-arm64" = "sha256-cLr3aTlcpOemiSQCZTDDkOrOGU87fkkZ1O/LKqLu08A=";
             "linux-x64" = "sha256-6oALf/ViJrcJUhJsn8HiUXykxLVoL9nT+eh0SWl6EZQ=";
           };
         };

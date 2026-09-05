@@ -40,6 +40,9 @@ jobs:
             git diff
           fi
 
+      - name: Verify OpenCode release hashes
+        run: ./verify-opencode-hashes.sh
+
       - name: Create PR
         if: steps.changes.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v6
