@@ -1,0 +1,66 @@
+name: Update Agent Versions
+
+on:
+  schedule:
+    - cron: '0 6 * * *'  # Daily at 6 AM UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-versions:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v12
+
+      - name: Run version update script
+        id: update
+        run: |
+          ./update-versions.sh
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No version changes detected"
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            git diff
+          fi
+
+      - name: Create PR
+        if: steps.changes.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: update agent versions"
+          title: "chore: update agent versions"
+          body: |
+            Automated update of agent versions.
+
+            ## Changes
+            ${{ steps.update.outputs.changes }}
+
+            ## Verification
+            Run `nix flake check` to verify builds.
+
+          branch: update-agent-versions
+          delete-branch: true
+
+      - name: Verify builds
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          nix flake check --no-build
+          nix build .#opencode .#claude-code --no-link
