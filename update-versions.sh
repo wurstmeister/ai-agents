@@ -32,7 +32,8 @@ update_version() {
   if [[ "$DRY_RUN" == "true" ]]; then
     echo "  [dry-run] Would update $agent to $new_version"
   else
-    sed -i '' "s/^[[:space:]]*${agent} = \"[^\"]*\"/  ${agent} = \"${new_version}\"/" "$FLAKE_FILE"
+    sed -i.bak "s/^[[:space:]]*${agent} = \"[^\"]*\"/  ${agent} = \"${new_version}\"/" "$FLAKE_FILE"
+    rm -f "${FLAKE_FILE}.bak"
     echo "  Updated $agent to $new_version"
   fi
 }
@@ -42,7 +43,8 @@ update_hash() {
   if [[ "$DRY_RUN" == "true" ]]; then
     echo "  [dry-run] Would update opencode hash to $new_hash"
   else
-    sed -i '' "s/opencode = \"sha256-[^\"]*\"/opencode = \"${new_hash}\"/" "$FLAKE_FILE"
+    sed -i.bak "s/opencode = \"sha256-[^\"]*\"/opencode = \"${new_hash}\"/" "$FLAKE_FILE"
+    rm -f "${FLAKE_FILE}.bak"
     echo "  Updated opencode hash to $new_hash"
   fi
 }
