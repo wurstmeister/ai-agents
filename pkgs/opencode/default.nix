@@ -48,6 +48,11 @@ stdenv.mkDerivation rec {
   dontUnpack = true;
   dontConfigure = true;
   dontBuild = true;
+  # Bun-compiled single-file executables break when stripped:
+  # the embedded bundle is corrupted and running the binary
+  # just prints `bun --help` instead of opencode.
+  # Same reason as pkgs/claude-code's `dontStrip = true`.
+  dontStrip = true;
 
   installPhase = ''
     runHook preInstall
