@@ -120,6 +120,13 @@ inputs = {
 };
 ```
 
+## CI: Automated Version Updates
+
+The `Update Agent Versions` workflow (`.github/workflows/update-versions.yml`) runs daily and opens a PR when new agent versions are available. For the PR creation step to work, one of the following is required:
+
+- Enable **Allow GitHub Actions to create and approve pull requests** under **Settings > Actions > General > Workflow permissions**, or
+- Add a `PR_TOKEN` repository secret containing a personal access token with `repo` scope (used in preference to the default `GITHUB_TOKEN`)
+
 ## Notes
 
 - **opencode**: Uses custom binary fetch from GitHub releases (fast builds, easy version overrides)
