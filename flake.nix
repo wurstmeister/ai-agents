@@ -29,14 +29,14 @@
         # Override versions here for quick updates
         # Each agent uses nixpkgs as the base but pins a specific version
         versions = {
-          opencode = "1.18.29";
-          claude-code = "2.1.261"; # from pkgs/claude-code/manifest.json
-          codex = "0.153.4";
-          qwen-code = "0.23.0";
+  opencode = "1.18.30";
+  claude-code = "2.1.269"; # from pkgs/claude-code/manifest.json
+  codex = "0.154.0";
+  qwen-code = "sdk-typescript-v0.1.12";
           goose = "3.28.0";
           aichat = "0.30.0";
           aider-chat = "0.86.0";
-          mistral-vibe = "2.25.0";
+  mistral-vibe = "2.25.3";
           pi-coding-agent = "0.84.2";
           codebuff = "1.0.684";
         };
@@ -44,10 +44,10 @@
         # Hashes for binary fetch agents (opencode)
         hashes = {
           opencode = {
-            "darwin-arm64" = "sha256-/nZPfzYMWEqD4Y3V8j+xprJyX17ohUsCUv5Vj3eY6UY=";
-            "darwin-x64" = "sha256-mFiFPnus270iwtcMN34AncSzVN0E9ViHBUEeevuJ/S0=";
-            "linux-arm64" = "sha256-cLr3aTlcpOemiSQCZTDDkOrOGU87fkkZ1O/LKqLu08A=";
-            "linux-x64" = "sha256-6oALf/ViJrcJUhJsn8HiUXykxLVoL9nT+eh0SWl6EZQ=";
+            "darwin-arm64" = "sha256-peQ9aIc4bvx9aM5Jrijju9/e49/R1xabYSw85n5Tseg=";
+            "darwin-x64" = "sha256-dFMAflj/EiQBQ42VzLJDNIdLWQjcrud4g/lsIzldVxA=";
+            "linux-arm64" = "sha256-QRGlXCoCwPrDFL1R6aIzAoDm0p0rhblVT/9tYmElZu0=";
+            "linux-x64" = "sha256-VQByRoWBZUlv+FuhwrZI90IejiATv0GJpoDJ/45pnRc=";
           };
         };
 
@@ -73,7 +73,7 @@
 
         # Tag format overrides for agents with non-standard tags
         tagFormats = {
-          codex = "rust-v${versions.codex}";
+  codex = "0.154.0";
           # Add more as needed
         };
 
