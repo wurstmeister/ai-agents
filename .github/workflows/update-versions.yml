@@ -7,7 +7,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
   update-versions:
@@ -17,12 +16,12 @@ jobs:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v12
+        uses: DeterminateSystems/nix-installer-action@v23
 
       - name: Run version update script
         id: update
@@ -43,32 +42,17 @@ jobs:
       - name: Verify OpenCode release hashes
         run: ./verify-opencode-hashes.sh
 
-      # Uses PR_TOKEN (a PAT with repo scope) if configured, otherwise falls
-      # back to GITHUB_TOKEN. The default GITHUB_TOKEN can only create PRs if
-      # "Allow GitHub Actions to create and approve pull requests" is enabled
-      # under Settings > Actions > General > Workflow permissions.
-      - name: Create PR
-        if: steps.changes.outputs.changed == 'true'
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.PR_TOKEN || secrets.GITHUB_TOKEN }}
-          commit-message: "chore: update agent versions"
-          title: "chore: update agent versions"
-          body: |
-            Automated update of agent versions.
-
-            ## Changes
-            ${{ steps.update.outputs.changes }}
-
-            ## Verification
-            Run `nix flake check` to verify builds.
-
-          branch: update-agent-versions
-          delete-branch: true
-
       - name: Verify builds
         if: steps.changes.outputs.changed == 'true'
         run: |
           nix flake check --no-build
           nix build .#opencode .#claude-code --no-link
           nix build .#checks.x86_64-linux.opencode-nixos --no-link
+
+      - name: Commit and push to main
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "chore: update agent versions"
+          git push origin HEAD:main
