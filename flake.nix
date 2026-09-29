@@ -30,8 +30,8 @@
         # Each agent uses nixpkgs as the base but pins a specific version
         versions = {
   opencode = "1.18.33";
-  claude-code = "2.1.283"; # from pkgs/claude-code/manifest.json
-  codex = "0.158.0";
+  claude-code = "2.1.284"; # from pkgs/claude-code/manifest.json
+  codex = "0.159.0";
   qwen-code = "sdk-typescript-v0.1.16";
           goose = "3.28.0";
           aichat = "0.30.0";
@@ -73,7 +73,7 @@
 
         # Tag format overrides for agents with non-standard tags
         tagFormats = {
-  codex = "0.158.0";
+  codex = "0.159.0";
           # Add more as needed
         };
 
