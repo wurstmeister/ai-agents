@@ -3,7 +3,7 @@
 A Nix flake for popular AI coding agents, kept closer to upstream than nixpkgs.
 
 Versions and platform hashes are pinned in `sources.json` (Claude Code uses its
-release manifest). Codex uses its complete upstream platform package, and Goose
+release manifest). Codex uses its complete GitHub release package, and Goose
 uses its upstream release binary (including static musl binaries on Linux). For agents packaged from source, if nixpkgs
 already ships the pinned version, the nixpkgs package is used unchanged (so it comes from the binary
 cache). If the pin is newer, the package is rebuilt from the new source with
@@ -15,7 +15,7 @@ correct source and dependency hashes.
 |---|---|---|
 | `opencode` (default) | OpenCode | release binary (`pkgs/opencode`) |
 | `claude-code` | Anthropic Claude Code | release binary (`pkgs/claude-code/manifest.json`) |
-| `codex` | OpenAI Codex CLI | official complete `@openai/codex` platform package |
+| `codex` | OpenAI Codex CLI | official complete GitHub release package |
 | `qwen-code` | Qwen Code | nixpkgs `qwen-code` |
 | `goose` | Goose (AAIF/Block) | official `aaif-goose/goose` release binary |
 | `aichat` | Multi-provider AI chat CLI | nixpkgs `aichat` |

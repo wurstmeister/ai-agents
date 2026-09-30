@@ -57,11 +57,9 @@ RELEASES = {
     "codex": {
         "repo": "openai/codex",
         "tag": rf"rust-v{SEMVER}",
-        "hash_type": "sha512",
         "assets": {
-            "aarch64-darwin": "https://registry.npmjs.org/@openai/codex/-/codex-{version}-darwin-arm64.tgz",
-            "aarch64-linux": "https://registry.npmjs.org/@openai/codex/-/codex-{version}-linux-arm64.tgz",
-            "x86_64-linux": "https://registry.npmjs.org/@openai/codex/-/codex-{version}-linux-x64.tgz",
+            system: f"https://github.com/openai/codex/releases/download/{{tag}}/codex-package-{triple}.tar.gz"
+            for system, triple in TRIPLES.items()
         },
     },
     "goose": {

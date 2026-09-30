@@ -149,13 +149,6 @@
               x86_64-linux = "x86_64-unknown-linux-musl";
             }
             .${system};
-          codexPlatform =
-            {
-              aarch64-darwin = "darwin-arm64";
-              aarch64-linux = "linux-arm64";
-              x86_64-linux = "linux-x64";
-            }
-            .${system};
           releaseBinary =
             name: args:
             pkgs.callPackage ./pkgs/release-binary (
@@ -168,11 +161,9 @@
             );
 
           codex = releaseBinary "codex" {
-            # The GitHub archive only ships a binary. Codex's app-server
-            # requires the complete package layout and companion binaries.
-            url = "https://registry.npmjs.org/@openai/codex/-/codex-${sources.codex.version}-${codexPlatform}.tgz";
+            url = "https://github.com/openai/codex/releases/download/rust-v${sources.codex.version}/codex-package-${triple}.tar.gz";
             binary = "bin/codex";
-            packageRoot = "package/vendor/${triple}";
+            packageRoot = ".";
             runtimeInputs = [
               pkgs.ripgrep
             ]
