@@ -11,48 +11,58 @@ permissions:
 jobs:
   update-versions:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # Agents newer than nixpkgs are built from source (codex, goose are Rust).
+    timeout-minutes: 240
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Free disk space
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
 
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@v23
 
-      - name: Run version update script
+      # Builds every updated agent and rolls back any that fail; exits 1 if
+      # something was rolled back, after writing the successful updates.
+      - name: Update versions
         id: update
-        run: |
-          ./update-versions.sh
+        continue-on-error: true
+        run: ./update-versions.py --update-nixpkgs --summary "$RUNNER_TEMP/summary.md"
 
       - name: Check for changes
         id: changes
         run: |
+          cat "$RUNNER_TEMP/summary.md" >> "$GITHUB_STEP_SUMMARY" || true
           if git diff --quiet; then
-            echo "changed=false" >> $GITHUB_OUTPUT
-            echo "No version changes detected"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
           else
-            echo "changed=true" >> $GITHUB_OUTPUT
-            git diff
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git diff --stat
           fi
-
-      - name: Verify OpenCode release hashes
-        run: ./verify-opencode-hashes.sh
 
       - name: Verify builds
         if: steps.changes.outputs.changed == 'true'
-        run: |
-          nix flake check --no-build
-          nix build .#opencode .#claude-code --no-link
-          nix build .#checks.x86_64-linux.opencode-nixos --no-link
+        run: ./verify-builds.sh
 
       - name: Commit and push to main
         if: steps.changes.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -am "chore: update agent versions"
+          git add -A sources.json flake.lock pkgs/
+          git commit -F - <<EOF
+          chore: update agent versions
+
+          $(grep -v '^- FAILED' "$RUNNER_TEMP/summary.md")
+          EOF
           git push origin HEAD:main
+
+      - name: Report rolled-back updates
+        if: steps.update.outcome == 'failure'
+        run: |
+          echo "::error::Some updates failed and were rolled back:"
+          grep '^- FAILED' "$RUNNER_TEMP/summary.md" || true
+          exit 1

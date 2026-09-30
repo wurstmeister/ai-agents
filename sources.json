@@ -1,0 +1,61 @@
+{
+  "aichat": {
+    "cargoHash": "sha256-u2JBPm03qvuLEUOEt4YL9O750V2QPgZbxvsvlTQe2nk=",
+    "hash": "sha256-xgTGii1xGtCc1OLoC53HAtQ+KVZNO1plB2GVtVBBlqs=",
+    "tag": "v0.30.0",
+    "version": "0.30.0"
+  },
+  "aider-chat": {
+    "hash": "sha256-UmLcE5gin1iILIY5okl5ac2vtiF30txUFjtC0mouBhs=",
+    "tag": "v0.86.1",
+    "version": "0.86.1"
+  },
+  "codebuff": {
+    "hash": "sha256-pK3Y4HfuYgXgAGhdhztUO+r4AfyZ8DCElW9I/mHcKXE=",
+    "npmDepsHash": "sha256-0HT631KWh2paoDhRfSS22iuojdwLAGO+oROm8xlQ3Kw=",
+    "version": "1.0.688"
+  },
+  "codex": {
+    "hashes": {
+      "aarch64-darwin": "sha512-62/e4TZ34z93KK3FYIHmo/K88aH0JRPA8x7SAVBdK4iG9f9HPO2tsDrJcmOj9z6DrFpMvPEVymomCbYpqN+ylQ==",
+      "aarch64-linux": "sha512-nEaBZT3ldrtqUNaBlvI+Y+fg+LbNCTsQjbUnl7Q45rl9vSSqHU2vRj1l6iJDwupZkrpeIJ/ClHIwxgMKv1SKHg==",
+      "x86_64-linux": "sha512-Eac8XlC0nCXSeUjDU9l8yLJ6P9evv1mO+AnvILoNwlegBC7B3AVXqJ05QcMhQX7RcJ3Lk2618ykCb2X2ui8VAQ=="
+    },
+    "version": "0.157.1"
+  },
+  "goose": {
+    "hashes": {
+      "aarch64-darwin": "sha256-dnSwEkqraFxx+Hgvt+ZbrBAMc2zj3gydO/RroHkQ5BI=",
+      "aarch64-linux": "sha256-RYS6iED8d8Lz5IdY9FVDwY8cEpPXBJQajutSIIUs5lM=",
+      "x86_64-linux": "sha256-/chmUyhaiffcrW52c2rxaIqyzeRGYbCJMosvxAu3n58="
+    },
+    "version": "1.52.0"
+  },
+  "mistral-vibe": {
+    "hash": "sha256-SCajBa+3xVnW02GzfRLICBgFBMHdJra2gjIkQW/A48E=",
+    "tag": "v2.24.5",
+    "version": "2.24.5"
+  },
+  "opencode": {
+    "hashes": {
+      "darwin-arm64": "sha256-+mQ/k0AcE1CNjVE3gOVM6cwBID1QERS+m4jWJAi4EB8=",
+      "darwin-x64": "sha256-okvxBJk4L4hV4Z0qCBuGg+SrmcfCr/sy3ImxfIoAzNY=",
+      "linux-arm64": "sha256-VoRht9TYwZhlyX6aEQLmEwScYDnQH+dyFU3oc8GGWEA=",
+      "linux-x64": "sha256-MEbgQE/cYPuAMH56R4JLoHR3NkF4pNCbqoVISW3W1Ds="
+    },
+    "version": "1.18.32"
+  },
+  "pi-coding-agent": {
+    "hash": "sha256-7z8OXao1PzmBEepDkIqVqyfQBPHulBlKcGymDYsnMvc=",
+    "modelDataHash": "sha256-39PJKc7lpzhxmaCiTfwb4glvHqj1n/uChRmKDtAev5M=",
+    "npmDepsHash": "sha256-35GC3Q4Jf4URvqoEYHeM63x49tTmrth62//PvKm4I7Q=",
+    "tag": "v0.84.4",
+    "version": "0.84.4"
+  },
+  "qwen-code": {
+    "hash": "sha256-XWhQ5GlAGW0WAyiPwBULLz1yQps2IdjVkusQ0a88tCs=",
+    "npmDepsHash": "sha256-2vr8Yspm6CCVnO6Jf8B3wiL6X+Tp6hZZEPr+WC/Dcak=",
+    "tag": "v0.16.0",
+    "version": "0.16.0"
+  }
+}

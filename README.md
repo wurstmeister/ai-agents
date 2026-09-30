@@ -1,140 +1,84 @@
 # Coding Agents Nix Flake
 
-This is a Nix flake for popular AI coding agents with quick version overrides.
+A Nix flake for popular AI coding agents, kept closer to upstream than nixpkgs.
 
-**The flake uses nixpkgs as the source but allows quick version bumps for faster updates.**
+Versions and platform hashes are pinned in `sources.json` (Claude Code uses its
+release manifest). Codex uses its complete upstream platform package, and Goose
+uses its upstream release binary (including static musl binaries on Linux). For agents packaged from source, if nixpkgs
+already ships the pinned version, the nixpkgs package is used unchanged (so it comes from the binary
+cache). If the pin is newer, the package is rebuilt from the new source with
+correct source and dependency hashes.
 
 ## Available Agents
 
-- **opencode** - The open source AI coding agent (from nixpkgs)
-- **claude-code** - Anthropic's official coding agent (local manifest-based fetch)
-- **codex** - OpenAI's coding agent
-- **qwen-code** - Qwen's coding agent
-- **goose** - Block's coding agent
-- **aichat** - Multi-provider AI chat CLI
-- **aider-chat** - AI pair programming
+| Package | Agent | Built from |
+|---|---|---|
+| `opencode` (default) | OpenCode | release binary (`pkgs/opencode`) |
+| `claude-code` | Anthropic Claude Code | release binary (`pkgs/claude-code/manifest.json`) |
+| `codex` | OpenAI Codex CLI | official complete `@openai/codex` platform package |
+| `qwen-code` | Qwen Code | nixpkgs `qwen-code` |
+| `goose` | Goose (AAIF/Block) | official `aaif-goose/goose` release binary |
+| `aichat` | Multi-provider AI chat CLI | nixpkgs `aichat` |
+| `aider-chat` | Aider | nixpkgs `aider-chat` |
+| `mistral-vibe` | Mistral Vibe | nixpkgs `mistral-vibe` |
+| `pi-coding-agent` | Pi | nixpkgs `pi-coding-agent` |
+| `codebuff` | Codebuff | nixpkgs `codebuff` (lock file in `pkgs/codebuff`) |
 
 ## Usage
 
-### Run an agent
-
 ```bash
-# Run opencode (default)
-nix run .
-
-# Run specific agents
+nix run .                  # opencode
 nix run .#claude-code
-nix run .#codex
-nix run .#qwen-code
-nix run .#goose
-nix run .#aichat
-nix run .#aider-chat
-
-# With arguments
-nix run .#opencode -- --help
 nix run .#codex -- --version
-```
-
-### Enter development shell
-
-```bash
-nix develop
-```
-
-This will give you a shell with all agents available in your PATH.
-
-### Install
-
-```bash
-# Install default (opencode)
-nix profile install .
-
-# Install specific agent
+nix develop                # shell with every agent
 nix profile install .#codex
 ```
 
-### Build a package
+## Updating
 
 ```bash
-nix build .#opencode
+./update-versions.py --dry-run          # show available updates
+./update-versions.py                    # update everything
+./update-versions.py codex goose        # update specific agents
+./update-versions.py --update-nixpkgs   # also run `nix flake update`
 ```
 
-The built package will be in `./result`.
+For each agent the updater:
 
-## Flake Outputs
+1. finds the latest stable release. Tags must match a strict pattern, so SDK
+   and pre-release tags are ignored.
+2. fetches platform artifacts and pins their hashes for binary agents.
+   For source packages, it computes every fixed-output hash (source, `cargoHash`, `npmDepsHash`, pi's
+   model data) by building with a fake hash, or copies nixpkgs' values if
+   nixpkgs already has that version. For codebuff it also regenerates
+   `pkgs/codebuff/package-lock.json`.
+3. builds the package, and rolls that agent back if the build fails.
 
-- `packages.<system>.default`: The opencode package
-- `packages.<system>.opencode`: OpenCode with binary fetch
-- `packages.<system>.claude-code`: Claude Code from nixpkgs
-- `packages.<system>.codex`: Codex from nixpkgs
-- `packages.<system>.qwen-code`: Qwen Code from nixpkgs
-- `packages.<system>.goose`: Goose from nixpkgs
-- `packages.<system>.aichat`: Aichat from nixpkgs
-- `packages.<system>.aider-chat`: Aider Chat from nixpkgs
+Rolled-back agents usually changed their build upstream (e.g. switched build
+system or added a workspace package), so nixpkgs' recipe no longer fits. They
+pick up again once nixpkgs repackages them and `--update-nixpkgs` pulls it in.
 
-## Customization
+Don't edit versions by hand without updating the hashes. Run
+`./update-versions.py <agent>` instead.
 
-### Change Agent Versions
+## CI
 
-To update an agent to a new version, edit `flake.nix`:
-
-```nix
-versions = {
-  opencode = "1.18.18";
-  claude-code = "2.1.235";  # Change this to your desired version
-  codex = "0.147.0";
-  qwen-code = "0.16.0";
-  goose = "3.27.3";
-  aichat = "0.30.0";
-  aider-chat = "0.86.1";
-};
-```
-
-**Most agents** (codex, qwen-code, goose, aichat, aider-chat) use `fetchFromGitHub` from nixpkgs, so the version override automatically updates the source.
-
-**For opencode**: Uses custom binary fetch from GitHub releases for fast builds. To update:
-1. Update `versions.opencode` in `flake.nix`
-2. Update `hashes.opencode` in `flake.nix` with the new sha256 (use a fake hash like `sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=` and rebuild; Nix will print the actual hash)
-
-**For claude-code**: The version is pinned in `pkgs/claude-code/manifest.json`. To update it:
-1. Run `./pkgs/claude-code/update.sh` to fetch the latest manifest
-2. Or manually edit the version in `flake.nix` and update the manifest checksums
-
-### Update claude-code manifest
-
-```bash
-# Fetch latest manifest from Anthropic's CDN
-./pkgs/claude-code/update.sh
-
-# Or update to a specific version
-./pkgs/claude-code/update.sh 2.1.236
-```
-
-### Pin nixpkgs
-
-You can also pin to a specific nixpkgs revision in `flake.nix`:
-
-```nix
-inputs = {
-  nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
-};
-```
-
-## CI: Automated Version Updates
-
-The `Update Agent Versions` workflow (`.github/workflows/update-versions.yml`) runs daily and opens a PR when new agent versions are available. For the PR creation step to work, one of the following is required:
-
-- Enable **Allow GitHub Actions to create and approve pull requests** under **Settings > Actions > General > Workflow permissions**, or
-- Add a `PR_TOKEN` repository secret containing a personal access token with `repo` scope (used in preference to the default `GITHUB_TOKEN`)
+- **Update Agent Versions** (`update-versions.yml`) runs daily. It runs the
+  updater with `--update-nixpkgs`, builds everything with `./verify-builds.sh`,
+  and commits the result straight to `main`. If any agent had to be rolled
+  back, the successful updates are still pushed and the run is marked failed.
+- **Verify Builds** (`verify-builds.yml`) runs `./verify-builds.sh` on pushes
+  and PRs. It builds every package, runs the flake checks, and checks all
+  four OpenCode platform hashes and all supported Codex/Goose platform hashes.
+  The Codex/Goose check also verifies that the flake and updater select the same
+  official release URL and pinned hash.
 
 ## Notes
 
-- **opencode**: Uses custom binary fetch from GitHub releases (fast builds, easy version overrides)
-- **claude-code**: Uses local package with manifest-based binary fetch (pinned in `pkgs/claude-code/manifest.json`)
-- **Other agents**: Use nixpkgs as base with version overrides for quick updates
-- **claude-code is unfree** - the flake is configured with `allowUnfreePredicate` to allow it
-- Supported systems: x86_64-linux, x86_64-darwin, aarch64-darwin, aarch64-linux
-
-## First Build
-
-The first build downloads the binaries from GitHub or builds from source. The build may take a moment as it fetches dependencies.
+- `claude-code` is unfree. The flake allows it via `allowUnfreePredicate`.
+- Codex and Goose do not compile Rust or fetch Cargo dependencies. Nix still
+  downloads packaging tools and runtime dependencies (such as ripgrep).
+- `flake.nix` and `sources.json` are authoritative. The experimental `flake.lisp`
+  and `mk_agent.lisp` predate this packaging; regenerating from them would restore
+  the old source-based overrides.
+- Supported systems: x86_64-linux, aarch64-linux, aarch64-darwin (nixpkgs dropped x86_64-darwin).

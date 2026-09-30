@@ -8,17 +8,16 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 240
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
+
+      - name: Free disk space
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
 
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v12
+        uses: DeterminateSystems/nix-installer-action@v23
 
       - name: Verify builds
-        run: |
-          ./verify-opencode-hashes.sh
-          nix flake check --no-build
-          nix build .#opencode .#claude-code --no-link
-          nix build .#checks.x86_64-linux.opencode-nixos --no-link
+        run: ./verify-builds.sh

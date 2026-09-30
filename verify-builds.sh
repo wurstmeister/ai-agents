@@ -1,24 +1,26 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Verify all agent packages build successfully
-# Used in CI after version updates
+# Build every package and run the flake checks. Used by CI.
 
-echo "Verifying flake..."
+cd "$(dirname "${BASH_SOURCE[0]}")"
+
+./verify-opencode-hashes.sh
+python3 ./verify-release-hashes.py
+
+echo "Checking flake..."
 nix flake check --no-build
 
-echo "Building opencode..."
-nix build .#opencode --no-link
+system=$(nix eval --impure --raw --expr builtins.currentSystem)
+package_names=$(nix eval --json ".#packages.$system" --apply builtins.attrNames | jq -r '.[]')
+packages=()
+while IFS= read -r package; do
+  packages+=("$package")
+done <<< "$package_names"
+echo "Building: ${packages[*]}"
+nix build --no-link -L "${packages[@]/#/.#}"
 
-echo "Building claude-code..."
-nix build .#claude-code --no-link
-
-# Test nixpkgs-based agents (these may fail if tag format doesn't match)
-# We build a subset to verify the override mechanism works
-echo "Testing nixpkgs-based agents..."
-for pkg in aichat; do
-  echo "Building $pkg..."
-  nix build .#$pkg --no-link
-done
+echo "Running checks..."
+nix flake check -L
 
 echo "All builds successful!"
