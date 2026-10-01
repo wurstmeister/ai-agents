@@ -4,6 +4,7 @@
   fetchurl,
   makeBinaryWrapper,
   installShellFiles,
+  unzip,
   versionCheckHook,
   pname,
   version,
@@ -14,6 +15,8 @@
   # Complete package directory inside the archive. When set, retain its
   # contents so binaries can discover their bundled metadata and helpers.
   packageRoot ? null,
+  # Some release archives ship a launcher without an executable mode bit.
+  makeExecutable ? false,
   mainProgram ? pname,
   # Added to PATH of the wrapped program
   runtimeInputs ? [ ],
@@ -31,6 +34,7 @@ stdenvNoCC.mkDerivation {
   nativeBuildInputs = [
     makeBinaryWrapper
     installShellFiles
+    unzip
   ];
 
   dontConfigure = true;
@@ -49,13 +53,14 @@ stdenvNoCC.mkDerivation {
           cp -a ${lib.escapeShellArg packageRoot}/. $out/libexec/${mainProgram}
         ''
     }
+    ${lib.optionalString makeExecutable "chmod +x $out/libexec/${mainProgram}/${binary}"}
     makeWrapper ${
       if packageRoot == null then
         "$out/libexec/${mainProgram}"
       else
         "$out/libexec/${mainProgram}/${binary}"
     } $out/bin/${mainProgram} \
-      --prefix PATH : ${lib.makeBinPath runtimeInputs}
+      ${lib.optionalString (runtimeInputs != [ ]) "--prefix PATH : ${lib.makeBinPath runtimeInputs}"}
     runHook postInstall
   '';
 

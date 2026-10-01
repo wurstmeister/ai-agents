@@ -17,11 +17,11 @@
   },
   "codex": {
     "hashes": {
-      "aarch64-darwin": "sha256-bNpTjRnC9Nnc6WU2mqIgEa+p3OjHpzwjS2brNhHqSqs=",
-      "aarch64-linux": "sha256-SZ/nDXD05JBLalpOwbHt9sShpHoHXqfi7CtSYrpHtHE=",
-      "x86_64-linux": "sha256-DiEYaMn9c8tJrTWsZ1ter99rn0U9+KST35gMWaWQ/l8="
+      "aarch64-darwin": "sha256-OKr23OYwmf0QmIlI0Du8bAR0JTrvaWH8vmD40VSzkQE=",
+      "aarch64-linux": "sha256-BaUkpGPK334+Isf5I1OcDQt0w+eLH18fq1LlDm+zMS8=",
+      "x86_64-linux": "sha256-ni0ppxO5RHiyQN7C8Q4RMkzQX6123EPnxjm9+KEzems="
     },
-    "version": "0.157.1"
+    "version": "0.159.2"
   },
   "goose": {
     "hashes": {
@@ -32,9 +32,12 @@
     "version": "1.52.0"
   },
   "mistral-vibe": {
-    "hash": "sha256-SCajBa+3xVnW02GzfRLICBgFBMHdJra2gjIkQW/A48E=",
-    "tag": "v2.24.5",
-    "version": "2.24.5"
+    "hashes": {
+      "aarch64-darwin": "sha256-Lzk6kFZVFnoE9y7UD/zrX+yDgJKd5YCaG9N9BFK//SU=",
+      "aarch64-linux": "sha256-YYxeJvAeQK5TUz3EcOCYwPL5H56yeWpZDqKtVyS1eVE=",
+      "x86_64-linux": "sha256-b8HqXSM4vKG7EQ09NugNq+kry3rc34d+JfqWl/TDrYQ="
+    },
+    "version": "2.25.8"
   },
   "opencode": {
     "hashes": {
@@ -46,16 +49,19 @@
     "version": "1.18.33"
   },
   "pi-coding-agent": {
-    "hash": "sha256-7z8OXao1PzmBEepDkIqVqyfQBPHulBlKcGymDYsnMvc=",
-    "modelDataHash": "sha256-39PJKc7lpzhxmaCiTfwb4glvHqj1n/uChRmKDtAev5M=",
-    "npmDepsHash": "sha256-35GC3Q4Jf4URvqoEYHeM63x49tTmrth62//PvKm4I7Q=",
-    "tag": "v0.84.4",
-    "version": "0.84.4"
+    "hashes": {
+      "aarch64-darwin": "sha256-VkcHpzeNrkzOKdkmk7RbSdOjolGH3dzG2MLkrKT7Nxk=",
+      "aarch64-linux": "sha256-Yfw82ahUyruFVONT/zJHAclS0v3QsalqoWrETPU1c2A=",
+      "x86_64-linux": "sha256-+ZjMEjJzPqskBSbXSs3OQp1lC54B9YBGNteqlutimEY="
+    },
+    "version": "0.99.2"
   },
   "qwen-code": {
-    "hash": "sha256-XWhQ5GlAGW0WAyiPwBULLz1yQps2IdjVkusQ0a88tCs=",
-    "npmDepsHash": "sha256-2vr8Yspm6CCVnO6Jf8B3wiL6X+Tp6hZZEPr+WC/Dcak=",
-    "tag": "v0.16.0",
-    "version": "0.16.0"
+    "hashes": {
+      "aarch64-darwin": "sha256-R6bZJuLzbacmCtCTwIEQ6fhmbpa1dty7xavM0Boqf+E=",
+      "aarch64-linux": "sha256-wRz+1wu4C4CyAw+QQhfeFzGOtyw8n4sBP36tnUs8qoQ=",
+      "x86_64-linux": "sha256-XxlT6sIqQTNIw2puulQvk5FfkNPGHsvv8e4yu6z7ZAo="
+    },
+    "version": "0.24.7"
   }
 }

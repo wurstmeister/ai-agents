@@ -104,19 +104,7 @@
           python = s: old: { src = fetchGitHub old s; };
 
           aichat = pin "aichat" "aichat" rust;
-          qwen-code = pin "qwen-code" "qwen-code" npm;
-          pi-coding-agent = pin "pi-coding-agent" "pi-coding-agent" (
-            s: old:
-            npm s old
-            // {
-              modelData = pkgs.fetchurl {
-                url = "https://registry.npmjs.org/@earendil-works/pi-ai/-/pi-ai-${s.version}.tgz";
-                hash = s.modelDataHash;
-              };
-            }
-          );
           aider-chat = pin "aider-chat" "aider-chat" python;
-          mistral-vibe = pin "mistral-vibe" "mistral-vibe" python;
           # codebuff ships no lock file; ./update-versions.py regenerates ours.
           codebuff = pin "codebuff" "codebuff" (
             s: old:
@@ -140,13 +128,27 @@
             }
           );
 
-          # Codex and Goose are large Rust builds; use upstream's published
-          # artifacts (static musl builds on Linux) instead of compiling.
+          # Release-backed agents retain their complete upstream packages so their
+          # bundled runtimes and helpers remain available at runtime.
           triple =
             {
               aarch64-darwin = "aarch64-apple-darwin";
               aarch64-linux = "aarch64-unknown-linux-musl";
               x86_64-linux = "x86_64-unknown-linux-musl";
+            }
+            .${system};
+          releasePlatform =
+            {
+              aarch64-darwin = "darwin-arm64";
+              aarch64-linux = "linux-arm64";
+              x86_64-linux = "linux-x64";
+            }
+            .${system};
+          vibePlatform =
+            {
+              aarch64-darwin = "darwin-aarch64";
+              aarch64-linux = "linux-aarch64";
+              x86_64-linux = "linux-x86_64";
             }
             .${system};
           releaseBinary =
@@ -191,6 +193,32 @@
                 wl-clipboard
               ];
             meta = { inherit (pkgs.goose-cli.meta) description homepage license; };
+          };
+
+          qwen-code = releaseBinary "qwen-code" {
+            url = "https://github.com/QwenLM/qwen-code/releases/download/v${sources.qwen-code.version}/qwen-code-${releasePlatform}.tar.gz";
+            binary = "bin/qwen";
+            packageRoot = "qwen-code";
+            mainProgram = "qwen";
+            runtimeInputs = [ pkgs.coreutils ];
+            meta = { inherit (pkgs.qwen-code.meta) description homepage license; };
+          };
+
+          pi-coding-agent = releaseBinary "pi-coding-agent" {
+            url = "https://github.com/earendil-works/pi/releases/download/v${sources.pi-coding-agent.version}/pi-${releasePlatform}.tar.gz";
+            binary = "pi";
+            packageRoot = "pi";
+            makeExecutable = true;
+            mainProgram = "pi";
+            meta = { inherit (pkgs.pi-coding-agent.meta) description homepage license; };
+          };
+
+          mistral-vibe = releaseBinary "mistral-vibe" {
+            url = "https://github.com/mistralai/mistral-vibe/releases/download/v${sources.mistral-vibe.version}/vibe-${vibePlatform}-${sources.mistral-vibe.version}.zip";
+            binary = "vibe";
+            packageRoot = ".";
+            mainProgram = "vibe";
+            meta = { inherit (pkgs.mistral-vibe.meta) description homepage license; };
           };
 
           # opencode uses binary fetch for fast builds and easy version overrides

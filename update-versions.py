@@ -57,6 +57,7 @@ RELEASES = {
     "codex": {
         "repo": "openai/codex",
         "tag": rf"rust-v{SEMVER}",
+        "tag_format": "rust-v{version}",
         "assets": {
             system: f"https://github.com/openai/codex/releases/download/{{tag}}/codex-package-{triple}.tar.gz"
             for system, triple in TRIPLES.items()
@@ -65,9 +66,49 @@ RELEASES = {
     "goose": {
         "repo": "aaif-goose/goose",
         "tag": rf"v{SEMVER}",
+        "tag_format": "v{version}",
         "assets": {
             system: f"https://github.com/aaif-goose/goose/releases/download/{{tag}}/goose-{t}.tar.gz"
             for system, t in TRIPLES.items()
+        },
+    },
+    "qwen-code": {
+        "repo": "QwenLM/qwen-code",
+        "tag": rf"v{SEMVER}",
+        "tag_format": "v{version}",
+        "assets": {
+            system: f"https://github.com/QwenLM/qwen-code/releases/download/{{tag}}/qwen-code-{platform}.tar.gz"
+            for system, platform in {
+                "aarch64-darwin": "darwin-arm64",
+                "aarch64-linux": "linux-arm64",
+                "x86_64-linux": "linux-x64",
+            }.items()
+        },
+    },
+    "pi-coding-agent": {
+        "repo": "earendil-works/pi",
+        "tag": rf"v{SEMVER}",
+        "tag_format": "v{version}",
+        "assets": {
+            system: f"https://github.com/earendil-works/pi/releases/download/{{tag}}/pi-{platform}.tar.gz"
+            for system, platform in {
+                "aarch64-darwin": "darwin-arm64",
+                "aarch64-linux": "linux-arm64",
+                "x86_64-linux": "linux-x64",
+            }.items()
+        },
+    },
+    "mistral-vibe": {
+        "repo": "mistralai/mistral-vibe",
+        "tag": rf"v{SEMVER}",
+        "tag_format": "v{version}",
+        "assets": {
+            system: f"https://github.com/mistralai/mistral-vibe/releases/download/{{tag}}/vibe-{platform}-{{version}}.zip"
+            for system, platform in {
+                "aarch64-darwin": "darwin-aarch64",
+                "aarch64-linux": "linux-aarch64",
+                "x86_64-linux": "linux-x86_64",
+            }.items()
         },
     },
 }
@@ -81,31 +122,9 @@ AGENTS = {
         "tag": rf"v{SEMVER}",
         "hashes": [("hash", "src"), ("cargoHash", "cargoDeps")],
     },
-    "qwen-code": {
-        "nixpkgs": "qwen-code",
-        "repo": "QwenLM/qwen-code",
-        "tag": rf"v{SEMVER}",
-        "hashes": [("hash", "src"), ("npmDepsHash", "npmDeps")],
-    },
-    "pi-coding-agent": {
-        "nixpkgs": "pi-coding-agent",
-        "repo": "earendil-works/pi",
-        "tag": rf"v{SEMVER}",
-        "hashes": [
-            ("hash", "src"),
-            ("modelDataHash", "modelData"),
-            ("npmDepsHash", "npmDeps"),
-        ],
-    },
     "aider-chat": {
         "nixpkgs": "aider-chat",
         "repo": "Aider-AI/aider",
-        "tag": rf"v{SEMVER}",
-        "hashes": [("hash", "src")],
-    },
-    "mistral-vibe": {
-        "nixpkgs": "mistral-vibe",
-        "repo": "mistralai/mistral-vibe",
         "tag": rf"v{SEMVER}",
         "hashes": [("hash", "src")],
     },
@@ -268,7 +287,11 @@ def update_release(name, dry_run):
     sources = load_sources()
     old = sources[name]["version"]
     version, tag = latest_github(spec["repo"], spec["tag"])
-    if version_key(version) <= version_key(old):
+    hashes = sources[name].get("hashes", {})
+    if version_key(version) < version_key(old) or (
+        version_key(version) == version_key(old)
+        and all(hashes.get(system) not in (None, FAKE_HASH) for system in spec["assets"])
+    ):
         return None
     change = f"{name}: {old} -> {version}"
     if dry_run:
