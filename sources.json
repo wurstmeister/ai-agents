@@ -1,20 +1,4 @@
 {
-  "aichat": {
-    "cargoHash": "sha256-u2JBPm03qvuLEUOEt4YL9O750V2QPgZbxvsvlTQe2nk=",
-    "hash": "sha256-xgTGii1xGtCc1OLoC53HAtQ+KVZNO1plB2GVtVBBlqs=",
-    "tag": "v0.30.0",
-    "version": "0.30.0"
-  },
-  "aider-chat": {
-    "hash": "sha256-UmLcE5gin1iILIY5okl5ac2vtiF30txUFjtC0mouBhs=",
-    "tag": "v0.86.1",
-    "version": "0.86.1"
-  },
-  "codebuff": {
-    "hash": "sha256-pK3Y4HfuYgXgAGhdhztUO+r4AfyZ8DCElW9I/mHcKXE=",
-    "npmDepsHash": "sha256-0HT631KWh2paoDhRfSS22iuojdwLAGO+oROm8xlQ3Kw=",
-    "version": "1.0.688"
-  },
   "codex": {
     "hashes": {
       "aarch64-darwin": "sha256-OKr23OYwmf0QmIlI0Du8bAR0JTrvaWH8vmD40VSzkQE=",
@@ -23,21 +7,13 @@
     },
     "version": "0.159.2"
   },
-  "goose": {
+  "copilot-cli": {
     "hashes": {
-      "aarch64-darwin": "sha256-dnSwEkqraFxx+Hgvt+ZbrBAMc2zj3gydO/RroHkQ5BI=",
-      "aarch64-linux": "sha256-RYS6iED8d8Lz5IdY9FVDwY8cEpPXBJQajutSIIUs5lM=",
-      "x86_64-linux": "sha256-/chmUyhaiffcrW52c2rxaIqyzeRGYbCJMosvxAu3n58="
+      "aarch64-darwin": "sha256-sp46nkF28uZBdQSRZxQyjQMPBKyTT/Gipt3K2SNchHs=",
+      "aarch64-linux": "sha256-JqQkkb7El6kh8ZjVUKYU4KiYnxwkGPW7HdIVDwnm6sA=",
+      "x86_64-linux": "sha256-DnoOhSkCKK/szk1O7UL9qAwPW5yG9DPeskbN4dXuyOU="
     },
-    "version": "1.52.0"
-  },
-  "mistral-vibe": {
-    "hashes": {
-      "aarch64-darwin": "sha256-Lzk6kFZVFnoE9y7UD/zrX+yDgJKd5YCaG9N9BFK//SU=",
-      "aarch64-linux": "sha256-YYxeJvAeQK5TUz3EcOCYwPL5H56yeWpZDqKtVyS1eVE=",
-      "x86_64-linux": "sha256-b8HqXSM4vKG7EQ09NugNq+kry3rc34d+JfqWl/TDrYQ="
-    },
-    "version": "2.25.8"
+    "version": "1.0.91"
   },
   "opencode": {
     "hashes": {
@@ -47,21 +23,5 @@
       "linux-x64": "sha256-5UYSMhOuR5CaQmhpKqS5SVDQEa/pysmTh1OiGU8cFtU="
     },
     "version": "1.18.33"
-  },
-  "pi-coding-agent": {
-    "hashes": {
-      "aarch64-darwin": "sha256-VkcHpzeNrkzOKdkmk7RbSdOjolGH3dzG2MLkrKT7Nxk=",
-      "aarch64-linux": "sha256-Yfw82ahUyruFVONT/zJHAclS0v3QsalqoWrETPU1c2A=",
-      "x86_64-linux": "sha256-+ZjMEjJzPqskBSbXSs3OQp1lC54B9YBGNteqlutimEY="
-    },
-    "version": "0.99.2"
-  },
-  "qwen-code": {
-    "hashes": {
-      "aarch64-darwin": "sha256-R6bZJuLzbacmCtCTwIEQ6fhmbpa1dty7xavM0Boqf+E=",
-      "aarch64-linux": "sha256-wRz+1wu4C4CyAw+QQhfeFzGOtyw8n4sBP36tnUs8qoQ=",
-      "x86_64-linux": "sha256-XxlT6sIqQTNIw2puulQvk5FfkNPGHsvv8e4yu6z7ZAo="
-    },
-    "version": "0.24.7"
   }
 }

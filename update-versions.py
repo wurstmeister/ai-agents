@@ -4,9 +4,7 @@
 For every agent this:
   1. finds the latest stable upstream release (tags are matched against a
      strict pattern, so SDK or pre-release tags are ignored),
-  2. computes every fixed-output hash by building with a fake hash and reading
-     the hash Nix reports (or copies nixpkgs' values if nixpkgs already ships
-     that version),
+  2. prefetches the release artifacts and pins their hashes,
   3. builds the package, and rolls the agent back if the build fails.
 
 Usage:
@@ -20,18 +18,14 @@ import argparse
 import json
 import os
 import re
-import shutil
 import subprocess
 import sys
-import tempfile
 import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 SOURCES = ROOT / "sources.json"
-CODEBUFF_LOCK = ROOT / "pkgs/codebuff/package-lock.json"
 CLAUDE_MANIFEST = ROOT / "pkgs/claude-code/manifest.json"
-FAKE_HASH = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
 SEMVER = r"(\d+\.\d+\.\d+)"
 TRIPLES = {
     "aarch64-darwin": "aarch64-apple-darwin",
@@ -63,78 +57,22 @@ RELEASES = {
             for system, triple in TRIPLES.items()
         },
     },
-    "goose": {
-        "repo": "aaif-goose/goose",
+    "copilot-cli": {
+        "repo": "github/copilot-cli",
         "tag": rf"v{SEMVER}",
         "tag_format": "v{version}",
         "assets": {
-            system: f"https://github.com/aaif-goose/goose/releases/download/{{tag}}/goose-{t}.tar.gz"
-            for system, t in TRIPLES.items()
-        },
-    },
-    "qwen-code": {
-        "repo": "QwenLM/qwen-code",
-        "tag": rf"v{SEMVER}",
-        "tag_format": "v{version}",
-        "assets": {
-            system: f"https://github.com/QwenLM/qwen-code/releases/download/{{tag}}/qwen-code-{platform}.tar.gz"
+            system: f"https://github.com/github/copilot-cli/releases/download/{{tag}}/copilot-{platform}.tar.gz"
             for system, platform in {
                 "aarch64-darwin": "darwin-arm64",
                 "aarch64-linux": "linux-arm64",
                 "x86_64-linux": "linux-x64",
-            }.items()
-        },
-    },
-    "pi-coding-agent": {
-        "repo": "earendil-works/pi",
-        "tag": rf"v{SEMVER}",
-        "tag_format": "v{version}",
-        "assets": {
-            system: f"https://github.com/earendil-works/pi/releases/download/{{tag}}/pi-{platform}.tar.gz"
-            for system, platform in {
-                "aarch64-darwin": "darwin-arm64",
-                "aarch64-linux": "linux-arm64",
-                "x86_64-linux": "linux-x64",
-            }.items()
-        },
-    },
-    "mistral-vibe": {
-        "repo": "mistralai/mistral-vibe",
-        "tag": rf"v{SEMVER}",
-        "tag_format": "v{version}",
-        "assets": {
-            system: f"https://github.com/mistralai/mistral-vibe/releases/download/{{tag}}/vibe-{platform}-{{version}}.zip"
-            for system, platform in {
-                "aarch64-darwin": "darwin-aarch64",
-                "aarch64-linux": "linux-aarch64",
-                "x86_64-linux": "linux-x86_64",
             }.items()
         },
     },
 }
 
-# name -> upstream + which fixed-output attributes hold which hash field.
-# Order matters: the source hash must be known before dependency hashes.
-AGENTS = {
-    "aichat": {
-        "nixpkgs": "aichat",
-        "repo": "sigoden/aichat",
-        "tag": rf"v{SEMVER}",
-        "hashes": [("hash", "src"), ("cargoHash", "cargoDeps")],
-    },
-    "aider-chat": {
-        "nixpkgs": "aider-chat",
-        "repo": "Aider-AI/aider",
-        "tag": rf"v{SEMVER}",
-        "hashes": [("hash", "src")],
-    },
-    "codebuff": {
-        "nixpkgs": "codebuff",
-        "npm": "codebuff",
-        "hashes": [("hash", "src"), ("npmDepsHash", "npmDeps")],
-    },
-}
-ALL = [*RELEASES, "claude-code", *AGENTS]
+ALL = [*RELEASES, "claude-code"]
 
 
 class UpdateError(Exception):
@@ -201,120 +139,40 @@ def build(system, attr):
     return run("nix", "build", "--no-link", "-L", f".#packages.{system}.{attr}", check=False)
 
 
-def got_hash(system, attr):
-    """Build a fixed-output attr that carries FAKE_HASH and return the real hash."""
-    proc = build(system, attr)
-    m = re.search(r"got:\s+(sha256-[A-Za-z0-9+/=]+)", proc.stderr)
-    if not m:
-        raise UpdateError(
-            f"expected a hash mismatch building {attr}, got:\n{proc.stderr[-4000:]}"
-        )
-    return m.group(1)
-
-
-def nixpkgs_eval(expr):
-    """Evaluate `expr` with `p` bound to this flake's pinned nixpkgs."""
-    full = (
-        f'let p = (builtins.getFlake "{ROOT}").inputs.nixpkgs'
-        f".legacyPackages.${{builtins.currentSystem}}; in {expr}"
-    )
-    return json.loads(run("nix", "eval", "--impure", "--json", "--expr", full).stdout)
-
-
-def nixpkgs_entry(name, spec):
-    """sources.json entry equal to what nixpkgs ships (used when it is current)."""
-    a = f'p."{spec["nixpkgs"]}"'
-    fields = {
-        "hash": f"{a}.src.outputHash",
-        "cargoHash": f"{a}.cargoHash",
-        "npmDepsHash": f"{a}.npmDeps.outputHash",
-        "modelDataHash": f"{a}.modelData.outputHash",
-    }
-    attrs = [f"version = {a}.version;"]
-    if "repo" in spec:
-        attrs.append(f"tag = {a}.src.tag;")
-    attrs += [f"{field} = {fields[field]};" for field, _ in spec["hashes"]]
-    return nixpkgs_eval("{ " + " ".join(attrs) + " }")
-
-
-def regenerate_codebuff_lock(version):
-    with tempfile.TemporaryDirectory() as tmp:
+def prefetch(spec, url):
+    return json.loads(
         run(
-            "nix", "shell", "nixpkgs#nodejs", "-c",
-            "npm", "install", "--package-lock-only", "--ignore-scripts",
-            f"codebuff@{version}",
-            cwd=tmp,
-        )
-        lock = json.loads((Path(tmp) / "package-lock.json").read_text())
-        lock["name"] = "codebuff"
-        CODEBUFF_LOCK.write_text(json.dumps(lock, indent=2) + "\n")
-
-
-def update_agent(name, system, dry_run):
-    spec = AGENTS[name]
-    sources = load_sources()
-    old = sources[name]
-    if "npm" in spec:
-        version = json.loads(http_get(f"https://registry.npmjs.org/{spec['npm']}/latest"))["version"]
-        tag = None
-    else:
-        version, tag = latest_github(spec["repo"], spec["tag"])
-    if version_key(version) <= version_key(old["version"]):
-        return None
-    change = f"{name}: {old['version']} -> {version}"
-    if dry_run:
-        return change
-
-    nixpkgs_version = nixpkgs_eval(f'p."{spec["nixpkgs"]}".version')
-    if nixpkgs_version == version:
-        sources[name] = nixpkgs_entry(name, spec)
-        save_sources(sources)
-    else:
-        entry = {"version": version, **({"tag": tag} if tag else {})}
-        entry.update({field: FAKE_HASH for field, _ in spec["hashes"]})
-        sources[name] = entry
-        save_sources(sources)
-        if name == "codebuff":
-            regenerate_codebuff_lock(version)
-        for field, attr in spec["hashes"]:
-            entry[field] = got_hash(system, f"{name}.{attr}")
-            save_sources(sources)
-    return change
+            "nix",
+            "store",
+            "prefetch-file",
+            "--json",
+            "--hash-type",
+            spec.get("hash_type", "sha256"),
+            url,
+        ).stdout
+    )["hash"]
 
 
 def update_release(name, dry_run):
     spec = RELEASES[name]
     sources = load_sources()
-    old = sources[name]["version"]
+    old = sources.get(name, {}).get("version", "0.0.0")
     version, tag = latest_github(spec["repo"], spec["tag"])
-    hashes = sources[name].get("hashes", {})
-    if version_key(version) < version_key(old) or (
-        version_key(version) == version_key(old)
-        and all(hashes.get(system) not in (None, FAKE_HASH) for system in spec["assets"])
-    ):
+    if version_key(version) <= version_key(old):
         return None
     change = f"{name}: {old} -> {version}"
     if dry_run:
         return change
-    hashes = {}
-    for platform, url in spec["assets"].items():
-        hashes[platform] = json.loads(
-            run(
-                "nix",
-                "store",
-                "prefetch-file",
-                "--json",
-                "--hash-type",
-                spec.get("hash_type", "sha256"),
-                url.format(tag=tag, version=version),
-            ).stdout
-        )["hash"]
+    hashes = {
+        platform: prefetch(spec, url.format(tag=tag, version=version))
+        for platform, url in spec["assets"].items()
+    }
     sources[name] = {"version": version, "hashes": hashes}
     save_sources(sources)
     return change
 
 
-def update_claude_code(system, dry_run):
+def update_claude_code(dry_run):
     base = "https://downloads.claude.ai/claude-code-releases"
     old = json.loads(CLAUDE_MANIFEST.read_text())["version"]
     version = http_get(f"{base}/latest").decode().strip()
@@ -327,7 +185,7 @@ def update_claude_code(system, dry_run):
 
 
 def snapshot():
-    return {p: p.read_bytes() for p in (SOURCES, CODEBUFF_LOCK, CLAUDE_MANIFEST, ROOT / "flake.lock")}
+    return {p: p.read_bytes() for p in (SOURCES, CLAUDE_MANIFEST, ROOT / "flake.lock")}
 
 
 def restore(snap):
@@ -370,10 +228,8 @@ def main():
         try:
             if name in RELEASES:
                 change = update_release(name, args.dry_run)
-            elif name == "claude-code":
-                change = update_claude_code(system, args.dry_run)
             else:
-                change = update_agent(name, system, args.dry_run)
+                change = update_claude_code(args.dry_run)
             if change is None:
                 log("  up to date")
                 continue

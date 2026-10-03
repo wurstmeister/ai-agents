@@ -2,12 +2,9 @@
 
 A Nix flake for popular AI coding agents, kept closer to upstream than nixpkgs.
 
-Versions and platform hashes are pinned in `sources.json` (Claude Code uses its
-release manifest). Codex, Qwen Code, Pi, Mistral Vibe, and Goose use their
-upstream release packages. For agents packaged from source, if nixpkgs
-already ships the pinned version, the nixpkgs package is used unchanged (so it comes from the binary
-cache). If the pin is newer, the package is rebuilt from the new source with
-correct source and dependency hashes.
+Every agent is packaged from its official upstream release binaries; nothing
+is compiled from source. Versions and platform hashes are pinned in
+`sources.json` (Claude Code uses its release manifest).
 
 ## Available Agents
 
@@ -16,13 +13,7 @@ correct source and dependency hashes.
 | `opencode` (default) | OpenCode | release binary (`pkgs/opencode`) |
 | `claude-code` | Anthropic Claude Code | release binary (`pkgs/claude-code/manifest.json`) |
 | `codex` | OpenAI Codex CLI | official complete GitHub release package |
-| `qwen-code` | Qwen Code | official `QwenLM/qwen-code` release package |
-| `goose` | Goose (AAIF/Block) | official `aaif-goose/goose` release binary |
-| `aichat` | Multi-provider AI chat CLI | nixpkgs `aichat` |
-| `aider-chat` | Aider | nixpkgs `aider-chat` |
-| `mistral-vibe` | Mistral Vibe | official `mistralai/mistral-vibe` release package |
-| `pi-coding-agent` | Pi | official `earendil-works/pi` release package |
-| `codebuff` | Codebuff | nixpkgs `codebuff` (lock file in `pkgs/codebuff`) |
+| `copilot-cli` | GitHub Copilot CLI | official `github/copilot-cli` release binary |
 
 ## Usage
 
@@ -39,7 +30,7 @@ nix profile install .#codex
 ```bash
 ./update-versions.py --dry-run          # show available updates
 ./update-versions.py                    # update everything
-./update-versions.py codex goose        # update specific agents
+./update-versions.py codex copilot-cli  # update specific agents
 ./update-versions.py --update-nixpkgs   # also run `nix flake update`
 ```
 
@@ -47,15 +38,11 @@ For each agent the updater:
 
 1. finds the latest stable release. Tags must match a strict pattern, so SDK
    and pre-release tags are ignored.
-2. fetches platform artifacts and pins their hashes for binary agents.
-   For source packages, it computes every fixed-output hash (source, `cargoHash`, `npmDepsHash`, pi's
-   model data) by building with a fake hash, or copies nixpkgs' values if
-   nixpkgs already has that version. For codebuff it also regenerates
-   `pkgs/codebuff/package-lock.json`.
+2. prefetches every supported platform's release artifact and pins its hash.
 3. builds the package, and rolls that agent back if the build fails.
 
-Rolled-back agents usually changed their release layout or source build inputs.
-The updater keeps the prior pin until the package recipe is updated.
+Rolled-back agents usually changed their release layout. The updater keeps the
+prior pin until the package recipe is updated.
 
 Don't edit versions by hand without updating the hashes. Run
 `./update-versions.py <agent>` instead.
@@ -74,10 +61,10 @@ Don't edit versions by hand without updating the hashes. Run
 
 ## Notes
 
-- `claude-code` is unfree. The flake allows it via `allowUnfreePredicate`.
-- Release-backed agents do not rebuild their upstream source trees. Nix still
-  downloads packaging tools and runtime dependencies (such as ripgrep).
+- `claude-code` and `copilot-cli` are unfree. The flake allows them via `allowUnfreePredicate`.
+- Nix still downloads packaging tools and runtime dependencies (such as ripgrep).
+  glibc-linked Linux binaries are patched with `autoPatchelfHook`.
 - `flake.nix` and `sources.json` are authoritative. The experimental `flake.lisp`
   and `mk_agent.lisp` predate this packaging; regenerating from them would restore
-  the old source-based overrides.
+  the old source-based overrides and removed agents.
 - Supported systems: x86_64-linux, aarch64-linux, aarch64-darwin (nixpkgs dropped x86_64-darwin).

@@ -11,7 +11,7 @@ permissions:
 jobs:
   update-versions:
     runs-on: ubuntu-latest
-    # Source and release-backed agents are built before a successful update is committed.
+    # Updated agents are built before a successful update is committed.
     timeout-minutes: 240
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

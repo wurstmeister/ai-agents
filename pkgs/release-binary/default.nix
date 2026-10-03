@@ -1,10 +1,11 @@
 {
   lib,
+  stdenv,
   stdenvNoCC,
   fetchurl,
+  autoPatchelfHook,
   makeBinaryWrapper,
   installShellFiles,
-  unzip,
   versionCheckHook,
   pname,
   version,
@@ -15,11 +16,13 @@
   # Complete package directory inside the archive. When set, retain its
   # contents so binaries can discover their bundled metadata and helpers.
   packageRoot ? null,
-  # Some release archives ship a launcher without an executable mode bit.
-  makeExecutable ? false,
   mainProgram ? pname,
+  # Patch glibc-linked Linux executables to run against Nix's glibc.
+  patchElf ? false,
   # Added to PATH of the wrapped program
   runtimeInputs ? [ ],
+  # Extra makeWrapper arguments
+  wrapperArgs ? [ ],
   # Generate completions via `<program> completion <shell>`
   completions ? false,
   meta ? { },
@@ -34,8 +37,9 @@ stdenvNoCC.mkDerivation {
   nativeBuildInputs = [
     makeBinaryWrapper
     installShellFiles
-    unzip
-  ];
+  ]
+  ++ lib.optionals (patchElf && stdenvNoCC.hostPlatform.isElf) [ autoPatchelfHook ];
+  buildInputs = lib.optionals (patchElf && stdenvNoCC.hostPlatform.isElf) [ stdenv.cc.cc.lib ];
 
   dontConfigure = true;
   dontBuild = true;
@@ -53,14 +57,14 @@ stdenvNoCC.mkDerivation {
           cp -a ${lib.escapeShellArg packageRoot}/. $out/libexec/${mainProgram}
         ''
     }
-    ${lib.optionalString makeExecutable "chmod +x $out/libexec/${mainProgram}/${binary}"}
     makeWrapper ${
       if packageRoot == null then
         "$out/libexec/${mainProgram}"
       else
         "$out/libexec/${mainProgram}/${binary}"
     } $out/bin/${mainProgram} \
-      ${lib.optionalString (runtimeInputs != [ ]) "--prefix PATH : ${lib.makeBinPath runtimeInputs}"}
+      ${lib.optionalString (runtimeInputs != [ ]) "--prefix PATH : ${lib.makeBinPath runtimeInputs}"} \
+      ${lib.escapeShellArgs wrapperArgs}
     runHook postInstall
   '';
 
@@ -78,6 +82,7 @@ stdenvNoCC.mkDerivation {
   nativeInstallCheckInputs = [ versionCheckHook ];
   versionCheckProgramArg = "--version";
   preInstallCheck = "export HOME=$(mktemp -d)";
+  versionCheckKeepEnvironment = [ "HOME" ];
 
   meta = {
     inherit mainProgram;
