@@ -15,11 +15,14 @@ successful ones are still written).
 """
 
 import argparse
+import http.client
 import json
 import os
 import re
 import subprocess
 import sys
+import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -95,8 +98,17 @@ def http_get(url):
     token = os.environ.get("GITHUB_TOKEN")
     if token and url.startswith("https://api.github.com/"):
         headers["Authorization"] = f"Bearer {token}"
-    with urllib.request.urlopen(urllib.request.Request(url, headers=headers)) as r:
-        return r.read()
+    # GitHub's API intermittently times out or truncates large listings.
+    for attempt in range(1, 4):
+        try:
+            with urllib.request.urlopen(urllib.request.Request(url, headers=headers)) as r:
+                return r.read()
+        except (http.client.IncompleteRead, urllib.error.URLError) as e:
+            transient = not isinstance(e, urllib.error.HTTPError) or e.code >= 500
+            if not transient or attempt == 3:
+                raise UpdateError(f"GET {url} failed: {e}") from e
+            log(f"  GET {url} failed ({e}), retrying...")
+            time.sleep(5 * attempt)
 
 
 def version_key(v):
