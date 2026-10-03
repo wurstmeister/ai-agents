@@ -1,20 +1,4 @@
 {
-  "aichat": {
-    "cargoHash": "sha256-u2JBPm03qvuLEUOEt4YL9O750V2QPgZbxvsvlTQe2nk=",
-    "hash": "sha256-xgTGii1xGtCc1OLoC53HAtQ+KVZNO1plB2GVtVBBlqs=",
-    "tag": "v0.30.0",
-    "version": "0.30.0"
-  },
-  "aider-chat": {
-    "hash": "sha256-UmLcE5gin1iILIY5okl5ac2vtiF30txUFjtC0mouBhs=",
-    "tag": "v0.86.1",
-    "version": "0.86.1"
-  },
-  "codebuff": {
-    "hash": "sha256-pK3Y4HfuYgXgAGhdhztUO+r4AfyZ8DCElW9I/mHcKXE=",
-    "npmDepsHash": "sha256-0HT631KWh2paoDhRfSS22iuojdwLAGO+oROm8xlQ3Kw=",
-    "version": "1.0.688"
-  },
   "codex": {
     "hashes": {
       "aarch64-darwin": "sha256-+tV6VoHKvO8h0yKvWuyTiXXPtxG18l1M5JB+ZWFhbQc=",
@@ -23,18 +7,13 @@
     },
     "version": "0.159.3"
   },
-  "goose": {
+  "copilot-cli": {
     "hashes": {
-      "aarch64-darwin": "sha256-dnSwEkqraFxx+Hgvt+ZbrBAMc2zj3gydO/RroHkQ5BI=",
-      "aarch64-linux": "sha256-RYS6iED8d8Lz5IdY9FVDwY8cEpPXBJQajutSIIUs5lM=",
-      "x86_64-linux": "sha256-/chmUyhaiffcrW52c2rxaIqyzeRGYbCJMosvxAu3n58="
+      "aarch64-darwin": "sha256-sp46nkF28uZBdQSRZxQyjQMPBKyTT/Gipt3K2SNchHs=",
+      "aarch64-linux": "sha256-JqQkkb7El6kh8ZjVUKYU4KiYnxwkGPW7HdIVDwnm6sA=",
+      "x86_64-linux": "sha256-DnoOhSkCKK/szk1O7UL9qAwPW5yG9DPeskbN4dXuyOU="
     },
-    "version": "1.52.0"
-  },
-  "mistral-vibe": {
-    "hash": "sha256-SCajBa+3xVnW02GzfRLICBgFBMHdJra2gjIkQW/A48E=",
-    "tag": "v2.24.5",
-    "version": "2.24.5"
+    "version": "1.0.91"
   },
   "opencode": {
     "hashes": {
@@ -44,18 +23,5 @@
       "linux-x64": "sha256-DyJHlkcibR0t2ZWV0gCC7nvaOHC2LcapC0Hvwacdfpo="
     },
     "version": "1.18.34"
-  },
-  "pi-coding-agent": {
-    "hash": "sha256-7z8OXao1PzmBEepDkIqVqyfQBPHulBlKcGymDYsnMvc=",
-    "modelDataHash": "sha256-39PJKc7lpzhxmaCiTfwb4glvHqj1n/uChRmKDtAev5M=",
-    "npmDepsHash": "sha256-35GC3Q4Jf4URvqoEYHeM63x49tTmrth62//PvKm4I7Q=",
-    "tag": "v0.84.4",
-    "version": "0.84.4"
-  },
-  "qwen-code": {
-    "hash": "sha256-XWhQ5GlAGW0WAyiPwBULLz1yQps2IdjVkusQ0a88tCs=",
-    "npmDepsHash": "sha256-2vr8Yspm6CCVnO6Jf8B3wiL6X+Tp6hZZEPr+WC/Dcak=",
-    "tag": "v0.16.0",
-    "version": "0.16.0"
   }
 }

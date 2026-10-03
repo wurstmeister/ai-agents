@@ -28,7 +28,7 @@
               pkg:
               builtins.elem (pkgs.lib.getName pkg) [
                 "claude-code"
-                "textual-speedups"
+                "copilot-cli"
               ];
           };
 
@@ -37,116 +37,21 @@
           # All versions and hashes live in sources.json, maintained by
           # ./update-versions.py. claude-code's version comes from its manifest.
           sources = lib.importJSON ./sources.json;
-          fetchGitHub =
-            old: s:
-            pkgs.fetchFromGitHub {
-              inherit (old.src) owner repo;
-              inherit (s) tag hash;
-            };
 
-          # Pin a nixpkgs package to the version in sources.json. When nixpkgs
-          # already ships that version, use it unchanged (binary cache hit).
-          # Otherwise override the source *and* every fixed-output fetcher that
-          # depends on it; overriding only `src.tag` silently reuses stale
-          # sources, and `cargoHash`/`npmDepsHash` do not propagate through
-          # overrideAttrs.
-          pin =
-            name: attr: override:
-            let
-              s = sources.${name};
-              base = pkgs.${attr};
-            in
-            if base.version == s.version then
-              base
-            else
-              base.overrideAttrs (old: { version = s.version; } // override s old);
-
-          rust =
-            s: old:
-            let
-              src = fetchGitHub old s;
-            in
-            {
-              inherit src;
-              cargoDeps = pkgs.rustPlatform.fetchCargoVendor (
-                {
-                  inherit src;
-                  name = "${old.pname}-${s.version}-vendor";
-                  hash = s.cargoHash;
-                  patches = old.cargoPatches or [ ];
-                }
-                // lib.optionalAttrs (old ? sourceRoot) { inherit (old) sourceRoot; }
-                // lib.optionalAttrs (old ? cargoRoot) { inherit (old) cargoRoot; }
-              );
-            };
-
-          npmDeps =
-            s: old: src: extra:
-            old.npmDeps.overrideAttrs (
-              {
-                inherit src;
-                name = "${old.pname}-${s.version}-npm-deps";
-                outputHash = s.npmDepsHash;
-              }
-              // extra
-            );
-
-          npm =
-            s: old:
-            let
-              src = fetchGitHub old s;
-            in
-            {
-              inherit src;
-              npmDeps = npmDeps s old src { };
-            };
-
-          python = s: old: { src = fetchGitHub old s; };
-
-          aichat = pin "aichat" "aichat" rust;
-          qwen-code = pin "qwen-code" "qwen-code" npm;
-          pi-coding-agent = pin "pi-coding-agent" "pi-coding-agent" (
-            s: old:
-            npm s old
-            // {
-              modelData = pkgs.fetchurl {
-                url = "https://registry.npmjs.org/@earendil-works/pi-ai/-/pi-ai-${s.version}.tgz";
-                hash = s.modelDataHash;
-              };
-            }
-          );
-          aider-chat = pin "aider-chat" "aider-chat" python;
-          mistral-vibe = pin "mistral-vibe" "mistral-vibe" python;
-          # codebuff ships no lock file; ./update-versions.py regenerates ours.
-          codebuff = pin "codebuff" "codebuff" (
-            s: old:
-            let
-              src = pkgs.fetchzip {
-                url = "https://registry.npmjs.org/codebuff/-/codebuff-${s.version}.tgz";
-                inherit (s) hash;
-              };
-              lockPatch = "cp ${./pkgs/codebuff/package-lock.json} package-lock.json";
-            in
-            {
-              inherit src;
-              # Some releases ship monorepo pack scripts (../release-core/...)
-              # that don't exist in the tarball; the tarball is already built.
-              postPatch = ''
-                ${lockPatch}
-                ${lib.getExe pkgs.jq} 'del(.scripts)' package.json > package.json.tmp
-                mv package.json.tmp package.json
-              '';
-              npmDeps = npmDeps s old src { postPatch = lockPatch; };
-            }
-          );
-
-          # Codex and Goose are large Rust builds; use upstream's published
-          # artifacts (static musl builds on Linux) instead of compiling.
+          # Codex retains its complete upstream package (static musl builds on
+          # Linux) so its bundled helpers remain available at runtime.
           triple =
             {
               aarch64-darwin = "aarch64-apple-darwin";
               aarch64-linux = "aarch64-unknown-linux-musl";
               x86_64-linux = "x86_64-unknown-linux-musl";
+            }
+            .${system};
+          copilotPlatform =
+            {
+              aarch64-darwin = "darwin-arm64";
+              aarch64-linux = "linux-arm64";
+              x86_64-linux = "linux-x64";
             }
             .${system};
           releaseBinary =
@@ -172,25 +77,21 @@
             meta = { inherit (pkgs.codex.meta) description homepage license; };
           };
 
-          # Block/AAIF's goose agent (nixpkgs `goose` is an unrelated DB migration tool)
-          goose = releaseBinary "goose" {
-            url = "https://github.com/aaif-goose/goose/releases/download/v${sources.goose.version}/goose-${triple}.tar.gz";
-            binary = "goose";
-            runtimeInputs =
-              with pkgs;
-              [
-                bash
-                python3
-              ]
-              ++ lib.optionals stdenv.hostPlatform.isLinux [
-                xdotool
-                wmctrl
-                xclip
-                xwininfo
-                wtype
-                wl-clipboard
-              ];
-            meta = { inherit (pkgs.goose-cli.meta) description homepage license; };
+          # The platform-specific single-executable release; its universal package
+          # is only an npm loader for these binaries.
+          copilot-cli = releaseBinary "copilot-cli" {
+            url = "https://github.com/github/copilot-cli/releases/download/v${sources.copilot-cli.version}/copilot-${copilotPlatform}.tar.gz";
+            binary = "copilot";
+            mainProgram = "copilot";
+            patchElf = true;
+            # Nix manages updates; the store copy cannot replace itself.
+            wrapperArgs = [
+              "--add-flags"
+              "--no-auto-update"
+            ];
+            meta = {
+              inherit (pkgs.github-copilot-cli.meta) description homepage license;
+            };
           };
 
           # opencode uses binary fetch for fast builds and easy version overrides
@@ -220,13 +121,7 @@
               opencode
               claude-code
               codex
-              qwen-code
-              goose
-              aichat
-              aider-chat
-              mistral-vibe
-              pi-coding-agent
-              codebuff
+              copilot-cli
               ;
           };
 
@@ -255,6 +150,10 @@
               type = "app";
               program = "${codex}/bin/codex";
             };
+            copilot-cli = {
+              type = "app";
+              program = "${copilot-cli}/bin/copilot";
+            };
           };
 
           devShells.default = pkgs.mkShell {
@@ -262,13 +161,7 @@
               opencode
               claude-code
               codex
-              qwen-code
-              goose
-              aichat
-              aider-chat
-              mistral-vibe
-              pi-coding-agent
-              codebuff
+              copilot-cli
             ];
           };
 
