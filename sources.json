@@ -17,11 +17,11 @@
   },
   "opencode": {
     "hashes": {
-      "darwin-arm64": "sha256-HJ2hELvz4TxIDgouVfYbCevbM8/GcCm2H/u5+FZtZ80=",
-      "darwin-x64": "sha256-nfehx1UqlXO5VWq5wesrPKxGs4DiUQaj2JuexmL0QZQ=",
-      "linux-arm64": "sha256-P3OkdAZbS3xKZM7yOVphI64QOcLkHwrL4prmUhtQ32Y=",
-      "linux-x64": "sha256-Tv+NLPhhTq2X6t8RI9RgM9yXXq3qw98EZEpkuuD56Bk="
+      "darwin-arm64": "sha256-wtD+zSes9uCL4CwfXThGFNB0lVh3ZrzEpr/zlxdJu2Q=",
+      "darwin-x64": "sha256-Tinb4vYaznKDcFI8iAJ9B0Kzp57c3Sxw5AT2FtTvjzY=",
+      "linux-arm64": "sha256-eQCBimqYiB7butq0t1JZQO/zuXUAQMIASB+fVsrO5AU=",
+      "linux-x64": "sha256-E6j7KXgwIHG4b51+ANqciJX5zYRpeDecO9xqUzNTbJs="
     },
-    "version": "1.19.2"
+    "version": "1.19.3"
   }
 }
