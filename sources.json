@@ -1,27 +1,27 @@
 {
   "codex": {
     "hashes": {
-      "aarch64-darwin": "sha256-sDRPwuQfFeAHEUflhpAIBHuP9L8sSoiXl107rj8QOzQ=",
-      "aarch64-linux": "sha256-nY7PLRnT4YSHeYOQLWyF3kiziI3LcsOCqKDJdYRZJ/s=",
-      "x86_64-linux": "sha256-WCZGxr8FYesN5UD3/IW5EhsAkagmvG6Wgwt/FyISIYI="
+      "aarch64-darwin": "sha256-3ZnpCSJwaRpnvd574ErCg96p2o6Gy941bCzIUaeSBfo=",
+      "aarch64-linux": "sha256-WRit1sfpzx4Uqa8bTA9L8dJKQ5A/qsJt9dxMAZ6pG9U=",
+      "x86_64-linux": "sha256-PsVQUxCWCNUDj35QdQ99Jfdo39dA/vBxqnEOJVm2Oqw="
     },
-    "version": "0.163.0"
+    "version": "0.164.0"
   },
   "copilot-cli": {
     "hashes": {
-      "aarch64-darwin": "sha256-YG+VObiK8RmFI/Zx/+625YVxq3FWQlLvvDshlvHtPys=",
-      "aarch64-linux": "sha256-Y07nzE+kt0R6xB4sPOVJKNj1IU9BiVTjrzbzcuhJyck=",
-      "x86_64-linux": "sha256-yruwSoioA03fohI0y9UrdnZTauwrKSYk5v1nlviRqP8="
+      "aarch64-darwin": "sha256-M+ZVOyPR4VlGaF3yl8rBLgs+/pgQIAnV5wk0U+zG5gs=",
+      "aarch64-linux": "sha256-coqR3/uaAoF72YxbAb8vnLCMT9rDwMqMSNfxzL/igqE=",
+      "x86_64-linux": "sha256-mutEMOmslSNUbbB7Inx6uheaRxClX5rCmtFDsPnhsyU="
     },
-    "version": "1.0.102"
+    "version": "1.0.103"
   },
   "opencode": {
     "hashes": {
-      "darwin-arm64": "sha256-wtD+zSes9uCL4CwfXThGFNB0lVh3ZrzEpr/zlxdJu2Q=",
-      "darwin-x64": "sha256-Tinb4vYaznKDcFI8iAJ9B0Kzp57c3Sxw5AT2FtTvjzY=",
-      "linux-arm64": "sha256-eQCBimqYiB7butq0t1JZQO/zuXUAQMIASB+fVsrO5AU=",
-      "linux-x64": "sha256-E6j7KXgwIHG4b51+ANqciJX5zYRpeDecO9xqUzNTbJs="
+      "darwin-arm64": "sha256-xACi+MirfplHin9N0aRmtXvzOIjlINhcVXgKVGTEtok=",
+      "darwin-x64": "sha256-Ej69cmCcT4264Ehc2sObmu3+tldrLu9k8ucxUrHegvQ=",
+      "linux-arm64": "sha256-hWgjDM2Efck+lbn2iUN5B30+AUoWtIBAdDVz53wj6F8=",
+      "linux-x64": "sha256-hJvWs9lZodLvIA7RY0pRx5pFyiNqomZl113r1pSAXM4="
     },
-    "version": "1.19.3"
+    "version": "1.19.4"
   }
 }
