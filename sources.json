@@ -17,11 +17,11 @@
   },
   "opencode": {
     "hashes": {
-      "darwin-arm64": "sha256-nfbKPQMVZcYQgMcXN0uoRtI47FscQR7r5rG4WDWZj/4=",
-      "darwin-x64": "sha256-0c+yMVy8oP4gh2p28u/GPJRaACKQsFqwHa3sM7Z6f5g=",
-      "linux-arm64": "sha256-w1TYotxBUjCL8oa17H8gs7PPxx+UduZPaqJ0FCUFsvg=",
-      "linux-x64": "sha256-MXlVHd9ph3yiSpYLAXXpRAXPP1IUfx7scFCUN0vvSfI="
+      "darwin-arm64": "sha256-ZdsDVz5XF+baJFrj5cL/o1kVuQaJ03xD1OGt5NR/Vfk=",
+      "darwin-x64": "sha256-5rZ97rMnrSXv+Uuzw52LFUZsPeAiTjoKR6OFtpombUw=",
+      "linux-arm64": "sha256-cqrILAISaPbMmBDekT+NR9BWJrGtl01/XcWwh+GtD2g=",
+      "linux-x64": "sha256-7zrur1UisQ1po9p7vW5tjSWfhFgz2WuDEHZ9NAexijU="
     },
-    "version": "2.2.1"
+    "version": "2.2.3"
   }
 }
