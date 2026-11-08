@@ -50,9 +50,9 @@ Don't edit versions by hand without updating the hashes. Run
 ## CI
 
 - **Update Agent Versions** (`update-versions.yml`) runs daily. It runs the
-  updater with `--update-nixpkgs`, builds everything with `./verify-builds.sh`,
-  and commits the result straight to `main`. If any agent had to be rolled
-  back, the successful updates are still pushed and the run is marked failed.
+  updater, builds everything with `./verify-builds.sh`, and commits the result
+  straight to `main`. If any agent had to be rolled back, the successful
+  updates are still pushed and the run is marked failed.
 - **Verify Builds** (`verify-builds.yml`) runs `./verify-builds.sh` on pushes
   and PRs. It builds every package, runs the flake checks, and checks all
   four OpenCode platform hashes and all supported release-agent platform hashes.

@@ -30,7 +30,7 @@ jobs:
       - name: Update versions
         id: update
         continue-on-error: true
-        run: ./update-versions.py --update-nixpkgs --summary "$RUNNER_TEMP/summary.md"
+        run: ./update-versions.py --summary "$RUNNER_TEMP/summary.md"
 
       - name: Check for changes
         id: changes
