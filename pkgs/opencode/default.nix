@@ -81,8 +81,24 @@ stdenv.mkDerivation rec {
     # doesn't overwrite itself (which would recurse forever on run)
     cp "$binary" $out/bin/.opencode-wrapped
 
-    # Create wrapper with NODE_OPTIONS
+    # Translate the opt-in --yolo alias; Nix manages binary updates.
     makeWrapper $out/bin/.opencode-wrapped $out/bin/opencode \
+      --run ${lib.escapeShellArg ''
+        args=()
+        for arg in "$@"; do
+          if [[ "$arg" == -- ]]; then
+            args+=("$@")
+            break
+          elif [[ "$arg" == --yolo ]]; then
+            args+=(--auto)
+          else
+            args+=("$arg")
+          fi
+          shift
+        done
+        set -- "''${args[@]}"
+      ''} \
+      --set OPENCODE_DISABLE_AUTOUPDATE 1 \
       --prefix NODE_OPTIONS : "--max-old-space-size=8192"
 
     runHook postInstall

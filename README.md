@@ -25,6 +25,25 @@ nix develop                # shell with every agent
 nix profile install .#codex
 ```
 
+All packages accept an opt-in `--yolo` option:
+
+```bash
+opencode --yolo
+claude --yolo
+codex --yolo
+copilot --yolo
+```
+
+Without `--yolo`, each agent keeps its normal permission behavior. The option
+maps to OpenCode's `--auto` and Claude Code's `--dangerously-skip-permissions`;
+Codex and Copilot support it natively. It skips approval prompts (and Codex's
+sandbox); only use it in trusted environments. OpenCode still honors explicit
+permission denials. Arguments after `--` are passed through unchanged.
+
+Agent self-updates and Codex's startup update checks are disabled. Claude Code
+plugin auto-updates are no longer forced. Update the pinned agents through Nix
+using the updater below.
+
 ## Updating
 
 ```bash

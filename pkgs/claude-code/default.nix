@@ -3,7 +3,7 @@
   stdenvNoCC,
   fetchurl,
   installShellFiles,
-  makeBinaryWrapper,
+  makeWrapper,
   autoPatchelfHook,
   alsa-lib,
   procps,
@@ -38,7 +38,7 @@ stdenv.mkDerivation (finalAttrs: {
 
   nativeBuildInputs = [
     installShellFiles
-    makeBinaryWrapper
+    makeWrapper
   ]
   ++ lib.optionals stdenv.hostPlatform.isElf [ autoPatchelfHook ];
 
@@ -50,8 +50,22 @@ stdenv.mkDerivation (finalAttrs: {
     installBin $src
 
     wrapProgram $out/bin/claude \
+      --run ${lib.escapeShellArg ''
+        args=()
+        for arg in "$@"; do
+          if [[ "$arg" == -- ]]; then
+            args+=("$@")
+            break
+          elif [[ "$arg" == --yolo ]]; then
+            args+=(--dangerously-skip-permissions)
+          else
+            args+=("$arg")
+          fi
+          shift
+        done
+        set -- "''${args[@]}"
+      ''} \
       --set DISABLE_AUTOUPDATER 1 \
-      --set-default FORCE_AUTOUPDATE_PLUGINS 1 \
       --set DISABLE_INSTALLATION_CHECKS 1 \
       --set USE_BUILTIN_RIPGREP 0 \
       ${lib.optionalString stdenv.hostPlatform.isLinux ''

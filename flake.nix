@@ -74,6 +74,10 @@
             ]
             ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [ pkgs.bubblewrap ];
             completions = true;
+            wrapperArgs = [
+              "--add-flags"
+              "-c check_for_update_on_startup=false"
+            ];
             meta = { inherit (pkgs.codex.meta) description homepage license; };
           };
 
