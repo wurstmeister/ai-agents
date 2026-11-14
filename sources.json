@@ -9,19 +9,19 @@
   },
   "copilot-cli": {
     "hashes": {
-      "aarch64-darwin": "sha256-fFJl/Xq0XqPEoapYYoi3VygSk2EvNG+Pp/7MEUFT8AE=",
-      "aarch64-linux": "sha256-Tt0jL6RZcGTEb4Sh6H1p3/lPpGGLSeUCCaxpfht/b0E=",
-      "x86_64-linux": "sha256-DI6u3teOy4ekA8PkR+TOD+nW2QwTYFhyhz2+L5wvksQ="
+      "aarch64-darwin": "sha256-SkpqpiTc63aiPhpT+19k6HoLtaIWGlAX4O33jXCCzmg=",
+      "aarch64-linux": "sha256-SR0YMDUFk1Z13CCYfvDF866Jn4HmbFPVZ62XqLA+UE4=",
+      "x86_64-linux": "sha256-3+flms8E8Lf1mwJOqdsQGpJGUD6b9xUutmj7sqRpsVE="
     },
-    "version": "1.0.110"
+    "version": "1.0.112"
   },
   "opencode": {
     "hashes": {
-      "darwin-arm64": "sha256-gRxCvpytSJ6oxBHq1J4G9pHe7klXupoKVqFZp9bBq9w=",
-      "darwin-x64": "sha256-Pk6pbs4EEhjMdLx8fVzSAv8feYPjL8erbFjVMkReeWE=",
-      "linux-arm64": "sha256-wWggV/CBXLKr3W4AMF8RRuuvHBZ/AzXNt03cgACBIOc=",
-      "linux-x64": "sha256-iabO4ie1S8ARF5xSil5jF2AyRisaXiFyO2FoAc3cLKc="
+      "darwin-arm64": "sha256-eQffKxJyCoQPu0nFuXi5uCkltr91R5pf0havqJMrZwI=",
+      "darwin-x64": "sha256-eaSEGSXjNE1btLAArPbFCxHeMB6QR6qb6p4ojnf+Qkk=",
+      "linux-arm64": "sha256-Mgf7XN7ESNR5JCwPGhT09738rTp5IJteuPkANyXpNxE=",
+      "linux-x64": "sha256-/A+BUirO6rrEdpPYg4nvorxRfOdMLDj9aWeBn8xuTTs="
     },
-    "version": "2.2.7"
+    "version": "2.3.0"
   }
 }
