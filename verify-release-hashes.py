@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 sys.dont_write_bytecode = True
-RELEASE_HASH_AGENTS = ("codex", "copilot-cli")
+RELEASE_HASH_AGENTS = ("opencode", "codex", "copilot-cli")
 
 spec = importlib.util.spec_from_file_location("updater", Path(__file__).with_name("update-versions.py"))
 updater = importlib.util.module_from_spec(spec)

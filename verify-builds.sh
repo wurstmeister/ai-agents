@@ -5,7 +5,6 @@ set -euo pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
-./verify-opencode-hashes.sh
 python3 ./verify-release-hashes.py
 
 echo "Checking flake..."

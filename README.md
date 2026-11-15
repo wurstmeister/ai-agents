@@ -10,8 +10,8 @@ is compiled from source. Versions and platform hashes are pinned in
 
 | Package | Agent | Built from |
 |---|---|---|
-| `opencode` (default) | OpenCode | release binary (`pkgs/opencode`) |
-| `claude-code` | Anthropic Claude Code | release binary (`pkgs/claude-code/manifest.json`) |
+| `opencode` (default) | OpenCode | official GitHub release binary |
+| `claude-code` | Anthropic Claude Code | release binary pinned by `pkgs/claude-code/manifest.json` |
 | `codex` | OpenAI Codex CLI | official complete GitHub release package |
 | `copilot-cli` | GitHub Copilot CLI | official `github/copilot-cli` release binary |
 
@@ -66,6 +66,13 @@ prior pin until the package recipe is updated.
 Don't edit versions by hand without updating the hashes. Run
 `./update-versions.py <agent>` instead.
 
+## Tests
+
+`nix flake check` includes `yolo-wrappers`, which rebuilds each wrapper around
+a stub that echoes its arguments. It asserts that `--yolo` reaches the agent as
+its native flag, that nothing is injected without it, and that `--yolo` after
+`--` is passed through untouched.
+
 ## CI
 
 - **Update Agent Versions** (`update-versions.yml`) runs daily. It runs the
@@ -73,9 +80,8 @@ Don't edit versions by hand without updating the hashes. Run
   straight to `main`. If any agent had to be rolled back, the successful
   updates are still pushed and the run is marked failed.
 - **Verify Builds** (`verify-builds.yml`) runs `./verify-builds.sh` on pushes
-  and PRs. It builds every package, runs the flake checks, and checks all
-  four OpenCode platform hashes and all supported release-agent platform hashes.
-  The release-agent check also verifies that the flake and updater select the
+  and PRs. It builds every package, runs the flake checks, and checks every
+  platform hash of opencode, codex and copilot-cli. The hash check also verifies that the flake and updater select the
   same official release URL and pinned hash.
 
 ## Notes
@@ -83,7 +89,7 @@ Don't edit versions by hand without updating the hashes. Run
 - `claude-code` and `copilot-cli` are unfree. The flake allows them via `allowUnfreePredicate`.
 - Nix still downloads packaging tools and runtime dependencies (such as ripgrep).
   glibc-linked Linux binaries are patched with `autoPatchelfHook`.
-- `flake.nix` and `sources.json` are authoritative. The experimental `flake.lisp`
-  and `mk_agent.lisp` predate this packaging; regenerating from them would restore
-  the old source-based overrides and removed agents.
+- All four agents share one recipe, `pkgs/release-binary`. Agent-specific
+  behaviour (the `--yolo` mapping, disabled updates, runtime tools) is passed
+  in from `flake.nix`.
 - Supported systems: x86_64-linux, aarch64-linux, aarch64-darwin (nixpkgs dropped x86_64-darwin).

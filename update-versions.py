@@ -41,13 +41,13 @@ RELEASES = {
     "opencode": {
         "repo": "anomalyco/opencode",
         "tag": rf"v{SEMVER}",
+        "tag_format": "v{version}",
         "assets": {
-            p: f"https://github.com/anomalyco/opencode/releases/download/{{tag}}/opencode-{p}.{ext}"
-            for p, ext in [
-                ("darwin-arm64", "zip"),
-                ("darwin-x64", "zip"),
-                ("linux-arm64", "tar.gz"),
-                ("linux-x64", "tar.gz"),
+            system: f"https://github.com/anomalyco/opencode/releases/download/{{tag}}/opencode-{platform}.{ext}"
+            for system, platform, ext in [
+                ("aarch64-darwin", "darwin-arm64", "zip"),
+                ("aarch64-linux", "linux-arm64", "tar.gz"),
+                ("x86_64-linux", "linux-x64", "tar.gz"),
             ]
         },
     },

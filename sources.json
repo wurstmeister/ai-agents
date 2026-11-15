@@ -17,10 +17,9 @@
   },
   "opencode": {
     "hashes": {
-      "darwin-arm64": "sha256-eQffKxJyCoQPu0nFuXi5uCkltr91R5pf0havqJMrZwI=",
-      "darwin-x64": "sha256-eaSEGSXjNE1btLAArPbFCxHeMB6QR6qb6p4ojnf+Qkk=",
-      "linux-arm64": "sha256-Mgf7XN7ESNR5JCwPGhT09738rTp5IJteuPkANyXpNxE=",
-      "linux-x64": "sha256-/A+BUirO6rrEdpPYg4nvorxRfOdMLDj9aWeBn8xuTTs="
+      "aarch64-darwin": "sha256-eQffKxJyCoQPu0nFuXi5uCkltr91R5pf0havqJMrZwI=",
+      "aarch64-linux": "sha256-Mgf7XN7ESNR5JCwPGhT09738rTp5IJteuPkANyXpNxE=",
+      "x86_64-linux": "sha256-/A+BUirO6rrEdpPYg4nvorxRfOdMLDj9aWeBn8xuTTs="
     },
     "version": "2.3.0"
   }
