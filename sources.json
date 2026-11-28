@@ -9,11 +9,11 @@
   },
   "copilot-cli": {
     "hashes": {
-      "aarch64-darwin": "sha256-rKoidxKGCXjYpzp6ZDlfZNuix3/KsjBPohqZXxI1VYQ=",
-      "aarch64-linux": "sha256-ujIHr9hYqTtjxczYPFP0P9sg/AD9QyYKUy+xS1+NB3Y=",
-      "x86_64-linux": "sha256-/+qDOYCpdnoYr/f9hFkIWgRCZsJspqntr+Wc3P9xjHk="
+      "aarch64-darwin": "sha256-CB6LSO8EbHodHB8xePoCYJmMKEj6cgtgCifySEDk+Lw=",
+      "aarch64-linux": "sha256-JFkciaahVfJul70IHqIPVcEuikI+qtAThufEmoCZCEY=",
+      "x86_64-linux": "sha256-0SBS2MtCwO5DRftiXT1l38bhn2UnfipIJ+4Qcjrc6Ko="
     },
-    "version": "1.0.116"
+    "version": "1.0.117"
   },
   "opencode": {
     "hashes": {
